@@ -40,7 +40,7 @@ eigenes Supabase-Projekt und eigene Schlüssel in `.env.local`.
 ## Sicherheit
 
 - Echte Schlüssel gehören nur in `.env.local`, nie ins Repository.
-- `SUPABASE_SERVICE_ROLE_KEY` und Stripe-Geheimnisse bleiben auf dem Server.
+- `SUPABASE_SECRET_KEY` und Stripe-Geheimnisse bleiben auf dem Server.
 - Der Admin-Bereich ist für Suchmaschinen gesperrt.
 
 ## Phasen

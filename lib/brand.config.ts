@@ -24,6 +24,12 @@ export const brand = {
   tagline: "Your Korean Skincare Expert",
   domain: "senseofbeauty.de",
   siteUrl: "https://senseofbeauty.de",
+  /** Platzhalter-Logo (altes Logo), wird ersetzt, sobald das neue Logo da ist. */
+  logo: {
+    src: "/brand/logo-placeholder.jpg",
+    alt: "Sense of Beauty by Filo",
+    placeholder: true,
+  },
   locale: "de-DE",
   language: "de",
   timezone: "Europe/Berlin",
