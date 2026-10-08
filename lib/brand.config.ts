@@ -40,10 +40,16 @@ export const brand = {
   /**
    * Titelfoto der Startseite. null = kein Foto (ruhiger Verlauf).
    * Zum Aktivieren: Foto nach public/brand/hero.jpg legen und hier eintragen, z. B.
-   * { src: "/brand/hero.jpg", alt: "…", focus: "70% center" }
-   * focus = welcher Bildausschnitt bei schmalen Bildschirmen sichtbar bleibt.
+   * { src: "/brand/hero.webp", alt: "…", focus: "70% 40%", tone: "dark" }
+   * focus = welcher Bildausschnitt sichtbar bleibt. tone: "dark" = dunkler Text (helles Foto),
+   * "light" = heller Text (dunkles Foto, wird abgedunkelt).
    */
-  hero: null as null | { src: string; alt: string; focus: string },
+  hero: {
+    src: "/brand/hero.webp",
+    alt: "",
+    focus: "60% 40%",
+    tone: "dark",
+  } as null | { src: string; alt: string; focus: string; tone: "dark" | "light" },
   locale: "de-DE",
   language: "de",
   timezone: "Europe/Berlin",

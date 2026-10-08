@@ -12,29 +12,47 @@ import type { CatalogGroup } from "@/lib/catalog";
  */
 export function Hero({ groups }: { groups: CatalogGroup[] }) {
   const hero = brand.hero;
-  const onPhoto = hero !== null;
+  // light = heller Text auf dunklem Foto (mit Abdunklung). dark = dunkler Text auf hellem Foto.
+  const lightText = hero?.tone === "light";
 
-  const text = onPhoto ? "text-cream" : "text-ink";
-  const muted = onPhoto ? "text-cream/85" : "text-cocoa";
+  const text = lightText ? "text-cream" : "text-ink";
+  const muted = lightText ? "text-cream/85" : "text-cocoa";
 
   return (
     <section className="relative isolate overflow-hidden">
       {hero ? (
         <>
-          <Image
-            src={hero.src}
-            alt={hero.alt}
-            fill
-            priority
-            sizes="100vw"
-            className="-z-20 object-cover"
-            style={{ objectPosition: hero.focus }}
-          />
-          {/* Abdunklung links/unten, damit Text und Karten gut lesbar bleiben */}
+          {/* Handy (dunkler Text): Foto oben, Text darunter. Ab Tablet: Foto im Hintergrund. */}
           <div
-            aria-hidden="true"
-            className="absolute inset-0 -z-10 bg-gradient-to-t from-ink/70 via-ink/25 to-ink/10 md:bg-gradient-to-r md:from-ink/65 md:via-ink/20 md:to-transparent"
-          />
+            className={
+              lightText
+                ? "absolute inset-0 -z-20"
+                : "relative h-[58dvh] md:absolute md:inset-y-0 md:right-0 md:-z-20 md:h-auto md:w-1/2"
+            }
+          >
+            <Image
+              src={hero.src}
+              alt={hero.alt}
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover"
+              style={{ objectPosition: hero.focus }}
+            />
+          </div>
+          {lightText ? (
+            <div
+              aria-hidden="true"
+              className="absolute inset-0 -z-10 bg-gradient-to-t from-ink/70 via-ink/25 to-ink/10 md:bg-gradient-to-r md:from-ink/65 md:via-ink/20 md:to-transparent"
+            />
+          ) : (
+            // Weicher Übergang vom Foto in die Seitenfarbe (nur ab Tablet, wo das Foto rechts steht)
+            <div
+              aria-hidden="true"
+              className="absolute inset-y-0 left-1/2 -z-10 hidden w-40 md:block"
+              style={{ background: "linear-gradient(to right, var(--cream), transparent)" }}
+            />
+          )}
         </>
       ) : (
         <div
@@ -44,17 +62,21 @@ export function Hero({ groups }: { groups: CatalogGroup[] }) {
         />
       )}
 
-      <div className="relative mx-auto flex min-h-[88dvh] w-full max-w-6xl flex-col justify-end px-5 pb-10 pt-24 md:justify-center md:pb-16">
+      <div
+        className={`relative mx-auto flex w-full max-w-6xl flex-col px-5 pb-10 md:min-h-[88dvh] md:justify-center md:pb-16 ${
+          hero && !lightText ? "pt-10 md:pt-24" : lightText ? "min-h-[88dvh] justify-end pt-24" : "min-h-[78dvh] justify-center pt-20"
+        }`}
+      >
         <p className={`text-xs uppercase tracking-[0.35em] ${muted}`}>Korean Skincare in {brand.address.city}</p>
-        <h1 className={`mt-6 max-w-3xl font-serif text-5xl leading-[1.04] md:text-7xl ${text}`}>
+        <h1 className={`mt-6 font-serif text-5xl leading-[1.04] md:text-7xl ${text} ${lightText || !hero ? "max-w-3xl" : "max-w-3xl md:max-w-[34rem]"}`}>
           Deine Haut darf wieder strahlen.
         </h1>
-        <p className={`mt-7 max-w-xl text-lg leading-relaxed ${muted}`}>
+        <p className={`mt-7 text-lg leading-relaxed ${muted} ${hero && !lightText ? "max-w-xl md:max-w-[30rem]" : "max-w-xl"}`}>
           Bei {brand.fullName} bekommst du eine Korean-Skincare-Behandlung, die zu deiner Haut passt, persönlich
           abgestimmt und in ruhiger Atmosphäre.
         </p>
         <div className="mt-10 flex flex-wrap gap-4">
-          {onPhoto ? (
+          {lightText ? (
             <>
               <Link
                 href="/book"
@@ -89,7 +111,7 @@ export function Hero({ groups }: { groups: CatalogGroup[] }) {
                 <Link
                   href={`/treatments#${category.slug}`}
                   className={
-                    onPhoto
+                    lightText
                       ? "flex h-full min-h-24 flex-col justify-between rounded-2xl border border-cream/30 bg-cream/15 p-5 text-cream backdrop-blur-md transition-colors hover:bg-cream/25"
                       : "flex h-full min-h-24 flex-col justify-between rounded-2xl border border-white/50 bg-white/40 p-5 text-ink backdrop-blur transition-colors hover:bg-white/60"
                   }
