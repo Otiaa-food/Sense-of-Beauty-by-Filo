@@ -37,6 +37,13 @@ export const brand = {
     width: 768,
     height: 737,
   },
+  /**
+   * Titelfoto der Startseite. null = kein Foto (ruhiger Verlauf).
+   * Zum Aktivieren: Foto nach public/brand/hero.jpg legen und hier eintragen, z. B.
+   * { src: "/brand/hero.jpg", alt: "…", focus: "70% center" }
+   * focus = welcher Bildausschnitt bei schmalen Bildschirmen sichtbar bleibt.
+   */
+  hero: null as null | { src: string; alt: string; focus: string },
   locale: "de-DE",
   language: "de",
   timezone: "Europe/Berlin",

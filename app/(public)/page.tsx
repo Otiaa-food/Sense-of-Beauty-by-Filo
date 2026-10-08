@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
+import { Hero } from "@/components/public/Hero";
 import { CatalogUnavailable } from "@/components/public/CatalogUnavailable";
-import { ButtonLink } from "@/components/ui/ButtonLink";
 import { brand, formatAddress } from "@/lib/brand.config";
 import { formatPrice, groupCatalog, lowestPrice } from "@/lib/catalog";
 import { getCatalog } from "@/lib/data/catalog";
@@ -34,52 +34,7 @@ export default async function HomePage() {
   return (
     <>
       {/* 1. Held:in und Versprechen */}
-      <section className="relative overflow-hidden">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute -right-24 top-10 h-[28rem] w-[28rem] rounded-full opacity-70 blur-2xl md:right-0 md:h-[36rem] md:w-[36rem]"
-          style={{ background: "radial-gradient(circle at 40% 40%, #E9DBC8 0%, #D9B793 45%, transparent 70%)" }}
-        />
-        <div className="relative mx-auto flex min-h-[78dvh] w-full max-w-6xl flex-col justify-center px-5 py-20">
-          <p className="text-xs uppercase tracking-[0.35em] text-cocoa">
-            Korean Skincare in {brand.address.city}
-          </p>
-          <h1 className="mt-6 max-w-3xl font-serif text-5xl leading-[1.04] text-ink md:text-7xl">
-            Deine Haut darf wieder strahlen.
-          </h1>
-          <p className="mt-7 max-w-xl text-lg leading-relaxed text-cocoa">
-            Bei {brand.fullName} bekommst du eine Korean-Skincare-Behandlung, die zu deiner Haut passt,
-            persönlich abgestimmt und in ruhiger Atmosphäre.
-          </p>
-          <div className="mt-10 flex flex-wrap gap-4">
-            <ButtonLink href="/book">Termin buchen</ButtonLink>
-            <ButtonLink href="/treatments" variant="secondary">
-              Behandlungen ansehen
-            </ButtonLink>
-          </div>
-          <p className="mt-6 text-sm text-cocoa">
-            Kostenlos stornieren bis {brand.booking.freeCancellationHours} Stunden vor dem Termin.
-          </p>
-
-          {catalog.ok && groups.length > 0 ? (
-            <ul className="mt-14 grid gap-3 sm:grid-cols-3">
-              {groups.map(({ category, services }) => (
-                <li key={category.id}>
-                  <Link
-                    href={`/treatments#${category.slug}`}
-                    className="flex h-full min-h-24 flex-col justify-between rounded-2xl border border-white/50 bg-white/40 p-5 backdrop-blur transition-colors hover:bg-white/60"
-                  >
-                    <span className="text-xs uppercase tracking-[0.25em] text-cocoa">{category.name}</span>
-                    <span className="mt-3 text-sm text-ink">
-                      {services.length} {services.length === 1 ? "Behandlung" : "Behandlungen"}
-                    </span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          ) : null}
-        </div>
-      </section>
+      <Hero groups={catalog.ok ? groups : []} />
 
       {/* 2. Das Problem */}
       <section className="bg-sand/40">
