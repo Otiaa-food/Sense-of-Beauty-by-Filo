@@ -1,0 +1,61 @@
+@import "tailwindcss";
+
+/*
+ * Markenfarben: warm und hautnah (Creme, Sand, Karamell, Kakao).
+ * Werte stehen auch in lib/brand.config.ts zur Dokumentation.
+ */
+:root {
+  --cream: #f6efe6;
+  --sand: #e9dbc8;
+  --caramel: #b58863;
+  --cocoa: #5e4130;
+  --ink: #2b2018;
+  --line: #dccbb4;
+
+  --background: var(--cream);
+  --foreground: var(--ink);
+}
+
+@theme inline {
+  --color-cream: var(--cream);
+  --color-sand: var(--sand);
+  --color-caramel: var(--caramel);
+  --color-cocoa: var(--cocoa);
+  --color-ink: var(--ink);
+  --color-line: var(--line);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --font-sans: var(--font-jost), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-cormorant), ui-serif, Georgia, serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Sichtbarer Fokus für Tastaturbedienung */
+:focus-visible {
+  outline: 2px solid var(--cocoa);
+  outline-offset: 3px;
+}
+
+/* Wer Bewegung reduzieren möchte, bekommt keine Animationen */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
