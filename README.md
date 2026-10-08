@@ -30,7 +30,10 @@ npm run build
 | `components` | Wiederverwendbare Bausteine |
 | `lib/brand.config.ts` | Name, Adresse, Zeiten, Farben, Fristen des Studios |
 | `lib/supabase` | Datenbank-Zugänge (Browser, Server, Admin) |
-| `tests` | Automatische Tests |
+| `supabase/migrations` | Datenbank-Baupläne (Schema, Sicherheit) |
+| `supabase/seed.sql` | Startdaten (erzeugt mit `npm run db:seed`) |
+| `docs` | Anleitungen, z. B. `supabase-einrichten.md` |
+| `tests` | Automatische Tests (inkl. echter Datenbank-Tests) |
 
 ## Für ein neues Studio
 
@@ -45,8 +48,8 @@ eigenes Supabase-Projekt und eigene Schlüssel in `.env.local`.
 
 ## Phasen
 
-1. Projekt-Setup (dieser Stand)
-2. Datenbank
+1. Projekt-Setup (fertig)
+2. Datenbank (fertig, wartet auf Einspielen in Supabase: `docs/supabase-einrichten.md`)
 3. Öffentliche Website
 4. Buchungsmotor
 5. Admin
