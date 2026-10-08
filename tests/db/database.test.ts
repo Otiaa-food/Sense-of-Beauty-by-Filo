@@ -98,8 +98,8 @@ afterAll(async () => {
 describe("Startdaten", () => {
   it("lädt Kategorien, Behandlungen, Arbeitszeiten und Einstellungen", async () => {
     expect(await count("service_categories")).toBe(3);
-    // 29 aus Filos Liste + 1 Testbehandlung
-    expect(await count("services")).toBe(30);
+    // 28 aus Filos Liste + 1 Testbehandlung
+    expect(await count("services")).toBe(29);
     expect(await count("availability_rules")).toBe(5);
   });
 
@@ -118,15 +118,23 @@ describe("Startdaten", () => {
     ]);
   });
 
-  it("schaltet ungeklärte Einträge und Zusatzleistungen nicht online frei", async () => {
+  it("schaltet Zusatzleistungen nicht online frei", async () => {
     const rows = (
       await db.query<{ name: string; online_booking_enabled: boolean }>(
-        `select name, online_booking_enabled from public.services
-         where addon_only or name = 'Rücken'`,
+        `select name, online_booking_enabled from public.services where addon_only`,
       )
     ).rows;
-    expect(rows).toHaveLength(3); // Massage + zweimal Rücken
+    expect(rows).toHaveLength(1); // Massage
     expect(rows.every((r) => r.online_booking_enabled === false)).toBe(true);
+  });
+
+  it("hat Rücken nur einmal (80 €) und 15 Minuten Pause bei allen Behandlungen", async () => {
+    const rucken = (await db.query<{ price: string }>("select price::text from public.services where name = 'Rücken'")).rows;
+    expect(rucken).toEqual([{ price: "80.00" }]);
+    const other = await one<{ n: number }>(
+      "select count(*)::int as n from public.services where buffer_minutes <> 15",
+    );
+    expect(other.n).toBe(0);
   });
 
   it("hat Filos Preise und Dauer korrekt übernommen", async () => {
@@ -146,7 +154,7 @@ describe("Startdaten", () => {
 
   it("lässt sich mehrfach laden, ohne etwas doppelt anzulegen", async () => {
     await db.exec(read("supabase/seed.sql"));
-    expect(await count("services")).toBe(30);
+    expect(await count("services")).toBe(29);
     expect(await count("service_categories")).toBe(3);
     expect(await count("availability_rules")).toBe(5);
   });
@@ -279,8 +287,8 @@ describe("create_booking (Buchungsfunktion für den Server)", () => {
   });
 
   it("lehnt nicht online buchbare Behandlungen ab (service_unavailable)", async () => {
-    const rucken = await one<{ id: string }>("select id from public.services where slug = 'ruecken'");
-    await expect(book("2026-12-14T10:00:00+01:00", "x@example.com", { service: rucken.id })).rejects.toThrow(
+    const massage = await one<{ id: string }>("select id from public.services where addon_only");
+    await expect(book("2026-12-14T10:00:00+01:00", "x@example.com", { service: massage.id })).rejects.toThrow(
       /service_unavailable/,
     );
     await expect(
@@ -330,7 +338,7 @@ describe("Zugriffsschutz (Row Level Security)", () => {
        values ('Versteckt', 'versteckt', 30, 10, false)`,
     );
     const visible = await as("anon", null, async () => (await db.query("select slug from public.services")).rows);
-    expect(visible.length).toBe(30); // 29 + Test, ohne die inaktive
+    expect(visible.length).toBe(29); // 28 + Test, ohne die inaktive
     expect(visible.some((r) => (r as { slug: string }).slug === "versteckt")).toBe(false);
   });
 

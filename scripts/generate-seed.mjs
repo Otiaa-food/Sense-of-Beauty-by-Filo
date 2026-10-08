@@ -93,7 +93,7 @@ const settings = [
   ["business_name", "Sense of Beauty by Filo", true],
   ["business_tagline", "Your Korean Skincare Expert", true],
   ["business_email", "", false],
-  ["business_phone", "", true],
+  ["business_phone", "+49 176 29741268", true],
   ["address", { street: "Luitgardstraße 14-18", detail: "2. OG", zip: "75177", city: "Pforzheim" }, true],
   ["timezone", "Europe/Berlin", true],
   ["currency", "EUR", true],

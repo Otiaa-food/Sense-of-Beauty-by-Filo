@@ -42,12 +42,13 @@ export const brand = {
     city: "Pforzheim",
   },
 
-  /** Wird nachgetragen, sobald Filo die Daten liefert. */
+  /** E-Mail kommt später (leer = wird auf der Website nicht angezeigt). */
   contact: {
     email: "",
-    phone: "",
-    instagram: "",
-    googleBusinessUrl: "",
+    phone: "+49 176 29741268",
+    instagram: "https://www.instagram.com/senseofbeauty.byfilo/",
+    instagramHandle: "@senseofbeauty.byfilo",
+    googleBusinessUrl: "https://share.google/wrzWTSz1nPj8REkX0",
   },
 
   /** Bestehende Buchungsregeln aus dem Interview (später in den Admin-Einstellungen änderbar). */
