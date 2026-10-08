@@ -25,6 +25,34 @@ export default function ContactPage() {
         Route anzeigen
       </a>
 
+      <ul className="mt-10 space-y-3 text-cocoa">
+        <li>
+          Telefon:{" "}
+          <a href={`tel:${brand.contact.phone.replace(/\s/g, "")}`} className="text-ink underline underline-offset-4">
+            {brand.contact.phone}
+          </a>
+        </li>
+        {brand.contact.email ? (
+          <li>
+            E-Mail:{" "}
+            <a href={`mailto:${brand.contact.email}`} className="text-ink underline underline-offset-4">
+              {brand.contact.email}
+            </a>
+          </li>
+        ) : null}
+        <li>
+          Instagram:{" "}
+          <a href={brand.contact.instagram} target="_blank" rel="noopener noreferrer" className="text-ink underline underline-offset-4">
+            {brand.contact.instagramHandle}
+          </a>
+        </li>
+        <li>
+          <a href={brand.contact.googleBusinessUrl} target="_blank" rel="noopener noreferrer" className="text-ink underline underline-offset-4">
+            Studio auf Google
+          </a>
+        </li>
+      </ul>
+
       <h2 className="mt-14 font-serif text-2xl text-ink">Öffnungszeiten</h2>
       <dl className="mt-4 max-w-sm space-y-1 text-ink">
         {openingHours.map((d) => (

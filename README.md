@@ -50,7 +50,7 @@ eigenes Supabase-Projekt und eigene Schlüssel in `.env.local`.
 
 1. Projekt-Setup (fertig)
 2. Datenbank (fertig, wartet auf Einspielen in Supabase: `docs/supabase-einrichten.md`)
-3. Öffentliche Website
+3. Öffentliche Website (fertig, Texte und Fotos von Filo folgen)
 4. Buchungsmotor
 5. Admin
 6. E-Mails

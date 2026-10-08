@@ -32,6 +32,16 @@ export function SiteFooter() {
           <ul className="mt-4 space-y-2 text-sm text-ink">
             <li><Link href="/book" className="hover:text-cocoa">Termin buchen</Link></li>
             <li><Link href="/contact" className="hover:text-cocoa">Kontakt</Link></li>
+            <li>
+              <a href={`tel:${brand.contact.phone.replace(/\s/g, "")}`} className="hover:text-cocoa">
+                {brand.contact.phone}
+              </a>
+            </li>
+            <li>
+              <a href={brand.contact.instagram} target="_blank" rel="noopener noreferrer" className="hover:text-cocoa">
+                Instagram
+              </a>
+            </li>
             <li><Link href="/impressum" className="hover:text-cocoa">Impressum</Link></li>
             <li><Link href="/datenschutz" className="hover:text-cocoa">Datenschutz</Link></li>
           </ul>
