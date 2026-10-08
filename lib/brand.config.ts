@@ -30,6 +30,13 @@ export const brand = {
     alt: "Sense of Beauty by Filo",
     placeholder: true,
   },
+  /** Portrait von Filo (von ihr/Benjamin geliefert). Vor dem Livegang von Filo bestätigen lassen. */
+  portrait: {
+    src: "/brand/filo-portrait.webp",
+    alt: "Filo, Inhaberin von Sense of Beauty, im schwarzen Blazer",
+    width: 768,
+    height: 737,
+  },
   locale: "de-DE",
   language: "de",
   timezone: "Europe/Berlin",

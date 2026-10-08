@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { CatalogUnavailable } from "@/components/public/CatalogUnavailable";
 import { ButtonLink } from "@/components/ui/ButtonLink";
@@ -59,6 +60,24 @@ export default async function HomePage() {
           <p className="mt-6 text-sm text-cocoa">
             Kostenlos stornieren bis {brand.booking.freeCancellationHours} Stunden vor dem Termin.
           </p>
+
+          {catalog.ok && groups.length > 0 ? (
+            <ul className="mt-14 grid gap-3 sm:grid-cols-3">
+              {groups.map(({ category, services }) => (
+                <li key={category.id}>
+                  <Link
+                    href={`/treatments#${category.slug}`}
+                    className="flex h-full min-h-24 flex-col justify-between rounded-2xl border border-white/50 bg-white/40 p-5 backdrop-blur transition-colors hover:bg-white/60"
+                  >
+                    <span className="text-xs uppercase tracking-[0.25em] text-cocoa">{category.name}</span>
+                    <span className="mt-3 text-sm text-ink">
+                      {services.length} {services.length === 1 ? "Behandlung" : "Behandlungen"}
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          ) : null}
         </div>
       </section>
 
@@ -79,11 +98,21 @@ export default async function HomePage() {
       </section>
 
       {/* 3. Die Führerin */}
-      <section className="mx-auto grid w-full max-w-6xl gap-10 px-5 py-20 md:grid-cols-2 md:gap-16 md:py-28">
-        <h2 className="font-serif text-3xl leading-tight text-ink md:text-5xl">
-          Du musst nicht raten. Filo schaut hin.
-        </h2>
+      <section className="mx-auto grid w-full max-w-6xl items-center gap-10 px-5 py-20 md:grid-cols-2 md:gap-16 md:py-28">
+        <div className="overflow-hidden rounded-[2rem] bg-sand">
+          <Image
+            src={brand.portrait.src}
+            alt={brand.portrait.alt}
+            width={brand.portrait.width}
+            height={brand.portrait.height}
+            sizes="(min-width: 768px) 560px, 100vw"
+            className="h-auto w-full"
+          />
+        </div>
         <div className="space-y-5 leading-relaxed text-cocoa">
+          <h2 className="font-serif text-3xl leading-tight text-ink md:text-5xl">
+            Du musst nicht raten. Filo schaut hin.
+          </h2>
           <p>
             Filo ist deine Expertin für Korean Skincare in Pforzheim. Sie nimmt sich Zeit für deine Haut, bevor
             sie behandelt, und erklärt dir, was sie tut und warum.
