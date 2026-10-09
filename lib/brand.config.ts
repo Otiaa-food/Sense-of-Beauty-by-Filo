@@ -80,11 +80,12 @@ export const brand = {
 
   /** Farben stehen als CSS-Variablen in app/globals.css. Hier nur zur Dokumentation. */
   colors: {
-    cream: "#F6EFE6",
-    sand: "#E9DBC8",
-    caramel: "#B58863",
+    cream: "#FBF7F1",
+    sand: "#EBDDC9",
+    caramel: "#A67C52",
     cocoa: "#5E4130",
     ink: "#2B2018",
+    espresso: "#241912",
   },
 } as const;
 

@@ -13,25 +13,24 @@ export const metadata: Metadata = {
 // Sie werden hier ergänzt, sobald Filo sie liefert. Es werden keine Angaben erfunden.
 export default function AboutPage() {
   return (
-    <section className="mx-auto w-full max-w-3xl px-5 py-16 md:py-24">
-      <p className="text-xs uppercase tracking-[0.3em] text-cocoa">Über Filo</p>
-      <h1 className="mt-4 font-serif text-4xl leading-tight text-ink md:text-6xl">
+    <section className="mx-auto w-full max-w-3xl px-5 py-20 md:py-32">
+      <h1 className="font-serif text-5xl font-light leading-[1.02] tracking-[-0.02em] text-ink md:text-7xl">
         Hautpflege, die bei dir anfängt.
       </h1>
 
-      <div className="mt-10 overflow-hidden rounded-[2rem] bg-sand">
+      <div className="mx-auto mt-14 w-full max-w-sm overflow-hidden rounded-t-[999px] bg-sand">
         <Image
           src={brand.portrait.src}
           alt={brand.portrait.alt}
           width={brand.portrait.width}
           height={brand.portrait.height}
-          sizes="(min-width: 768px) 768px, 100vw"
+          sizes="(min-width: 768px) 384px, 100vw"
           priority
-          className="h-auto w-full"
+          className="aspect-[4/5] h-auto w-full object-cover object-top"
         />
       </div>
 
-      <div className="mt-10 space-y-6 text-lg leading-relaxed text-cocoa">
+      <div className="mt-14 space-y-6 text-[1.1rem] font-[350] leading-8 text-cocoa">
         <p>
           {brand.fullName} ist ein Kosmetikstudio in {brand.address.city}, das sich auf Korean Skincare
           spezialisiert hat. Filo verbindet Wirkstoffkosmetik nach koreanischem Vorbild mit etwas, das viele
@@ -47,7 +46,7 @@ export default function AboutPage() {
         </p>
       </div>
 
-      <div className="mt-12 flex flex-wrap gap-4">
+      <div className="mt-12 flex flex-wrap items-center gap-x-8 gap-y-3">
         <ButtonLink href="/book">Termin buchen</ButtonLink>
         <ButtonLink href="/treatments" variant="secondary">
           Behandlungen ansehen

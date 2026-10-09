@@ -10,15 +10,13 @@ const nav = [
 
 export function SiteHeader() {
   return (
-    <header className="sticky top-0 z-40 border-b border-line/70 bg-cream/90 backdrop-blur">
+    <header className="sticky top-0 z-40 border-b border-line/60 bg-cream/90 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5">
         <Link href="/" aria-label={`${brand.fullName}, zur Startseite`} className="leading-none">
-          <span className="block font-serif text-2xl tracking-wide text-ink">
+          <span className="block font-serif text-[1.7rem] font-light tracking-wide text-ink">
             {brand.name}
           </span>
-          <span className="block text-[0.65rem] uppercase tracking-[0.3em] text-cocoa">
-            {brand.byline}
-          </span>
+          <span className="block font-serif text-sm italic text-cocoa">{brand.byline}</span>
         </Link>
 
         <nav aria-label="Hauptnavigation" className="hidden items-center gap-8 md:flex">
@@ -26,14 +24,14 @@ export function SiteHeader() {
             <Link
               key={item.href}
               href={item.href}
-              className="text-sm tracking-wide text-cocoa transition-colors hover:text-ink"
+              className="text-[0.95rem] tracking-wide text-cocoa transition-colors hover:text-ink"
             >
               {item.label}
             </Link>
           ))}
           <Link
             href="/book"
-            className="rounded-full bg-cocoa px-5 py-2 text-sm tracking-wide text-cream transition-colors hover:bg-ink"
+            className="rounded-full bg-ink px-6 py-2.5 text-sm tracking-wide text-cream transition-colors hover:bg-cocoa"
           >
             Termin buchen
           </Link>
@@ -62,7 +60,7 @@ export function SiteHeader() {
             ))}
             <Link
               href="/book"
-              className="mt-2 block rounded-full bg-cocoa px-4 py-3 text-center text-cream"
+              className="mt-2 block rounded-full bg-ink px-4 py-3 text-center text-cream"
             >
               Termin buchen
             </Link>
