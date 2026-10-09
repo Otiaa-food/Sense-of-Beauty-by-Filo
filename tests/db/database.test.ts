@@ -73,6 +73,7 @@ beforeAll(async () => {
 
   await db.exec(read("supabase/migrations/20261008000001_schema.sql"));
   await db.exec(read("supabase/migrations/20261008000002_security.sql"));
+  await db.exec(read("supabase/migrations/20261009000003_admin.sql"));
   await db.exec(read("supabase/seed.sql"));
 
   await db.exec(`insert into auth.users (id) values ('${ADMIN_ID}'), ('${OTHER_ID}');`);
@@ -424,5 +425,40 @@ describe("Zugriffsschutz (Row Level Security)", () => {
     );
     const done = await one<{ visible: boolean }>("select visible from public.reviews where author_name = 'Neu N.'");
     expect(done.visible).toBe(true);
+  });
+});
+
+describe("Admin-Bereich (Phase 5)", () => {
+  it("erlaubt Kundinnen ohne E-Mail (telefonische Buchung), E-Mails bleiben eindeutig", async () => {
+    await db.query("insert into public.customers (first_name, last_name, phone) values ('Ohne', 'Mail', '0170 1')");
+    await db.query("insert into public.customers (first_name, last_name, phone) values ('Auch', 'Ohne', '0170 2')");
+    await expect(
+      db.query("insert into public.customers (first_name, last_name, email) values ('X', 'Y', 'MARIA@example.com')"),
+    ).rejects.toThrow();
+  });
+
+  it("lässt eingeloggte Admins Termine anlegen, aber nie überschneidend", async () => {
+    const svc = await one<{ id: string }>("select id from public.services where slug = 'test-glow-facial'");
+    const cust = await one<{ id: string }>("select id from public.customers where last_name = 'Mail'");
+    const insert = (start: string) =>
+      as("authenticated", ADMIN_ID, () =>
+        db.query(
+          `insert into public.appointments (customer_id, service_id, start_time, end_time, blocked_until, price, source)
+           values ($1, $2, $3::timestamptz, $3::timestamptz + interval '75 minutes', $3::timestamptz + interval '90 minutes', 89, 'admin')`,
+          [cust.id, svc.id, start],
+        ),
+      );
+    await expect(insert("2027-02-01T10:00:00+01:00")).resolves.toBeDefined();
+    await expect(insert("2027-02-01T11:00:00+01:00")).rejects.toThrow(/appointments_no_overlap/);
+    // Fremde (nicht Admin) dürfen nichts anlegen
+    await expect(
+      as("authenticated", OTHER_ID, () =>
+        db.query(
+          `insert into public.appointments (customer_id, service_id, start_time, end_time, blocked_until, price)
+           values ($1, $2, '2027-03-01T10:00:00+01:00', '2027-03-01T11:00:00+01:00', '2027-03-01T11:15:00+01:00', 1)`,
+          [cust.id, svc.id],
+        ),
+      ),
+    ).rejects.toThrow();
   });
 });
