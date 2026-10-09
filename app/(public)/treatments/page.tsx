@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { CatalogUnavailable } from "@/components/public/CatalogUnavailable";
+import { PageIntro } from "@/components/public/PageIntro";
+import { SocialGrid } from "@/components/public/SocialGrid";
 import { TreatmentList } from "@/components/public/TreatmentList";
 import { groupCatalog } from "@/lib/catalog";
 import { getCatalog } from "@/lib/data/catalog";
@@ -16,18 +18,19 @@ export default async function TreatmentsPage() {
   const groups = groupCatalog(catalog.categories, catalog.services);
 
   return (
-    <section className="mx-auto w-full max-w-4xl px-5 py-20 md:py-32">
-      <h1 className="font-serif text-5xl font-light leading-[1.02] tracking-[-0.02em] text-ink md:text-8xl">
-        Behandlungen
-      </h1>
-      <p className="mt-8 max-w-xl font-serif text-2xl font-light italic leading-snug text-cocoa">
-        Du bist unsicher, welche die richtige ist? Bei den Korean Facials beginnt Filo mit einer Hautanalyse und
-        empfiehlt dir danach, was zu deiner Haut passt.
-      </p>
-
-      <div className="mt-24">
+    <>
+      <section className="mx-auto w-full max-w-3xl px-5 pb-12 pt-16 md:pt-24">
+        <PageIntro title="Behandlungen & Preise">
+          <p>
+            Du bist unsicher, welche Behandlung die richtige ist? Bei den Korean Facials beginnt Filo mit einer
+            Hautanalyse und empfiehlt dir danach, was zu deiner Haut passt.
+          </p>
+        </PageIntro>
+      </section>
+      <div className="mx-auto w-full max-w-3xl px-1.5 sm:px-5">
         {catalog.ok && groups.length > 0 ? <TreatmentList groups={groups} /> : <CatalogUnavailable />}
       </div>
-    </section>
+      <SocialGrid />
+    </>
   );
 }

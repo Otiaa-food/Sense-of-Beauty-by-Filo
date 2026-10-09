@@ -27,13 +27,13 @@ export default function AdminLayout({
     <div className="flex min-h-dvh flex-col md:flex-row">
       <nav
         aria-label="Admin-Navigation"
-        className="flex gap-1 overflow-x-auto border-b border-line bg-sand/40 p-2 md:w-56 md:flex-col md:border-b-0 md:border-r md:p-4"
+        className="flex gap-1 overflow-x-auto border-b border-line bg-stone p-2 md:w-56 md:flex-col md:border-b-0 md:border-r md:p-4"
       >
         {links.map((l) => (
           <Link
             key={l.href}
             href={l.href}
-            className="whitespace-nowrap rounded-xl px-4 py-2.5 text-sm text-cocoa hover:bg-cream hover:text-ink"
+            className="whitespace-nowrap px-4 py-2.5 text-sm text-muted hover:bg-paper hover:text-espresso"
           >
             {l.label}
           </Link>

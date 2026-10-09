@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
-import Image from "next/image";
+import { PageIntro } from "@/components/public/PageIntro";
+import { PhotoFill } from "@/components/public/PhotoFill";
+import { SocialGrid } from "@/components/public/SocialGrid";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { brand } from "@/lib/brand.config";
+import { photos } from "@/lib/media";
 
 export const metadata: Metadata = {
   title: "Über Filo",
@@ -9,49 +12,67 @@ export const metadata: Metadata = {
   alternates: { canonical: "/about" },
 };
 
-// Hinweis: Filos persönlicher Werdegang, Ausbildungen und Fotos fehlen noch.
-// Sie werden hier ergänzt, sobald Filo sie liefert. Es werden keine Angaben erfunden.
+// ENTWURF: Texte bitte von Filo prüfen und mit ihren eigenen Worten ergänzen (Werdegang, Philosophie).
+// Es werden keine Angaben erfunden. Die Schulung stammt aus Filos Instagram-Beitrag (Februar 2026).
 export default function AboutPage() {
   return (
-    <section className="mx-auto w-full max-w-3xl px-5 py-20 md:py-32">
-      <h1 className="font-serif text-5xl font-light leading-[1.02] tracking-[-0.02em] text-ink md:text-7xl">
-        Hautpflege, die bei dir anfängt.
-      </h1>
+    <>
+      <section className="mx-auto w-full max-w-3xl px-5 pb-12 pt-16 md:pt-24">
+        <PageIntro title="Hey, ich bin Filo.">
+          <p>
+            Ich bin Kosmetikerin und Inhaberin von {brand.fullName} in {brand.address.city}. Mein Schwerpunkt ist
+            Korean Skincare: Wirkstoffkosmetik nach koreanischem Vorbild, persönlich auf deine Haut abgestimmt.
+          </p>
+        </PageIntro>
+      </section>
 
-      <div className="mx-auto mt-14 w-full max-w-sm overflow-hidden rounded-t-[999px] bg-sand">
-        <Image
-          src={brand.portrait.src}
-          alt={brand.portrait.alt}
-          width={brand.portrait.width}
-          height={brand.portrait.height}
-          sizes="(min-width: 768px) 384px, 100vw"
-          priority
-          className="aspect-[4/5] h-auto w-full object-cover object-top"
-        />
+      <div className="mx-auto max-w-3xl px-1.5 sm:px-5">
+        <div className="relative aspect-[4/5]">
+          <PhotoFill photo={photos.filoNeon} sizes="(min-width: 768px) 768px, 100vw" priority />
+        </div>
       </div>
 
-      <div className="mt-14 space-y-6 text-[1.1rem] font-[350] leading-8 text-cocoa">
-        <p>
-          {brand.fullName} ist ein Kosmetikstudio in {brand.address.city}, das sich auf Korean Skincare
-          spezialisiert hat. Filo verbindet Wirkstoffkosmetik nach koreanischem Vorbild mit etwas, das viele
-          Kundinnen vermissen: Zeit und persönliche Aufmerksamkeit.
-        </p>
-        <p>
-          Bevor sie behandelt, schaut Filo sich deine Haut an. Danach empfiehlt sie dir die Behandlung, die dazu
-          passt, und sagt dir auch, wenn du etwas nicht brauchst.
-        </p>
-        <p>
-          Neben den Korean Facials findest du bei ihr Laserbehandlungen zur Haarentfernung und Behandlungen für
-          Wimpern.
-        </p>
+      <section className="mx-auto max-w-3xl px-5 py-14 md:py-20">
+        <h2 className="text-3xl font-light text-espresso md:text-4xl">Mein Werdegang</h2>
+        <div className="mt-6 space-y-4 text-[1rem] leading-[1.85] text-muted">
+          <p>
+            Koreanische Hautpflege begleitet mich schon lange. Um meine Behandlungen stetig weiterzuentwickeln,
+            bilde ich mich regelmäßig fort.
+          </p>
+          <p>
+            Im Februar 2026 habe ich in Frankfurt eine Schulung zum K-Beauty Facial mit den Produkten von OD Graphy
+            abgeschlossen.
+          </p>
+        </div>
+      </section>
+
+      <div className="mx-auto grid max-w-3xl grid-cols-2 gap-1.5 px-1.5 sm:px-5">
+        <div className="relative aspect-[4/5]">
+          <PhotoFill photo={photos.schulungZertifikat} sizes="(min-width: 768px) 384px, 50vw" />
+        </div>
+        <div className="relative aspect-[4/5]">
+          <PhotoFill photo={photos.schulungTrainerin} sizes="(min-width: 768px) 384px, 50vw" />
+        </div>
       </div>
 
-      <div className="mt-12 flex flex-wrap items-center gap-x-8 gap-y-3">
-        <ButtonLink href="/book">Termin buchen</ButtonLink>
-        <ButtonLink href="/treatments" variant="secondary">
-          Behandlungen ansehen
-        </ButtonLink>
-      </div>
-    </section>
+      <section className="mx-auto max-w-3xl px-5 py-14 md:py-20">
+        <h2 className="text-3xl font-light text-espresso md:text-4xl">Meine Philosophie</h2>
+        <div className="mt-6 space-y-4 text-[1rem] leading-[1.85] text-muted">
+          <p>
+            Jede Haut ist anders. Deshalb gibt es bei mir keine Behandlung von der Stange: Ich schaue mir deine Haut
+            an, erkläre dir, was ich tue, und empfehle dir nur, was du wirklich brauchst.
+          </p>
+          <p>Mein Ziel ist, dass du dich in deiner Haut wohlfühlst und weißt, wie du sie zu Hause pflegst.</p>
+        </div>
+        <div className="mt-10 flex flex-wrap gap-3">
+          <ButtonLink href="/book">Termin buchen</ButtonLink>
+          <ButtonLink href="/reviews" variant="outline">
+            Stimmen lesen
+          </ButtonLink>
+        </div>
+      </section>
+
+      <SocialGrid />
+    </>
   );
 }

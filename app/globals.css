@@ -1,74 +1,64 @@
 @import "tailwindcss";
 
 /*
- * Markenfarben: warm und hautnah (Creme, Sand, Karamell, Kakao).
+ * Farben nach docs/styleguide.md (Lumo-Aufbau, Filos warme Farbwelt).
  * Werte stehen auch in lib/brand.config.ts zur Dokumentation.
  */
 :root {
-  --cream: #fbf7f1;
-  --sand: #ebddc9;
-  --caramel: #a67c52;
-  --cocoa: #5e4130;
-  --ink: #2b2018;
-  --espresso: #241912;
-  --line: #dccbb4;
+  --paper: #faf7f2;
+  --stone: #ede6dc;
+  --taupe: #857262;
+  --espresso: #2b2420;
+  --muted: #5f544c;
+  --line: #ddd2c4;
 
-  --background: var(--cream);
-  --foreground: var(--ink);
+  --background: var(--paper);
+  --foreground: var(--espresso);
 }
 
 @theme inline {
-  --color-cream: var(--cream);
-  --color-sand: var(--sand);
-  --color-caramel: var(--caramel);
-  --color-cocoa: var(--cocoa);
-  --color-ink: var(--ink);
+  --color-paper: var(--paper);
+  --color-stone: var(--stone);
+  --color-taupe: var(--taupe);
   --color-espresso: var(--espresso);
+  --color-muted: var(--muted);
   --color-line: var(--line);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
 
-  --font-sans: var(--font-jost), ui-sans-serif, system-ui, sans-serif;
-  --font-serif: var(--font-cormorant), ui-serif, Georgia, serif;
+  --font-sans: var(--font-montserrat), ui-sans-serif, system-ui, sans-serif;
 }
 
 html {
   scroll-behavior: smooth;
 }
 
-/* Feines Korn über der ganzen Seite: gibt flachen Flächen Tiefe, wie Papier */
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: 60;
-  pointer-events: none;
-  opacity: 0.045;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
-}
-
-/* Der eine Auftritt beim Laden: Foto blendet ein, Text steigt leicht auf */
-@keyframes photo-in {
-  from { opacity: 0; transform: scale(1.05); }
-  to { opacity: 1; transform: none; }
-}
-@keyframes rise {
-  from { opacity: 0; transform: translateY(14px); }
-  to { opacity: 1; transform: none; }
-}
-.photo-in { animation: photo-in 1.8s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
-.rise { animation: rise 1.1s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
-
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
+  font-weight: 350;
   -webkit-font-smoothing: antialiased;
 }
 
+/* Kleine Großbuchstaben-Labels und Knöpfe (wie bei Lumo) */
+.label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+/* Titelbild blendet beim Laden sanft ein */
+@keyframes media-in {
+  from { opacity: 0; transform: scale(1.04); }
+  to { opacity: 1; transform: none; }
+}
+.media-in { animation: media-in 1.6s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+
 /* Sichtbarer Fokus für Tastaturbedienung */
 :focus-visible {
-  outline: 2px solid var(--cocoa);
+  outline: 2px solid var(--espresso);
   outline-offset: 3px;
 }
 

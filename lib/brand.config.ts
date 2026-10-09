@@ -30,26 +30,7 @@ export const brand = {
     alt: "Sense of Beauty by Filo",
     placeholder: true,
   },
-  /** Portrait von Filo (von ihr/Benjamin geliefert). Vor dem Livegang von Filo bestätigen lassen. */
-  portrait: {
-    src: "/brand/filo-portrait.webp",
-    alt: "Filo, Inhaberin von Sense of Beauty, im schwarzen Blazer",
-    width: 768,
-    height: 737,
-  },
-  /**
-   * Titelfoto der Startseite. null = kein Foto (ruhiger Verlauf).
-   * Zum Aktivieren: Foto nach public/brand/hero.jpg legen und hier eintragen, z. B.
-   * { src: "/brand/hero.webp", alt: "…", focus: "70% 40%", tone: "dark" }
-   * focus = welcher Bildausschnitt sichtbar bleibt. tone: "dark" = dunkler Text (helles Foto),
-   * "light" = heller Text (dunkles Foto, wird abgedunkelt).
-   */
-  hero: {
-    src: "/brand/hero.webp",
-    alt: "",
-    focus: "60% 40%",
-    tone: "dark",
-  } as null | { src: string; alt: string; focus: string; tone: "dark" | "light" },
+  // Fotos und Titel-Video: siehe lib/media.ts
   locale: "de-DE",
   language: "de",
   timezone: "Europe/Berlin",
@@ -78,14 +59,13 @@ export const brand = {
     freeCancellationHours: 24,
   },
 
-  /** Farben stehen als CSS-Variablen in app/globals.css. Hier nur zur Dokumentation. */
+  /** Farben stehen als CSS-Variablen in app/globals.css (siehe docs/styleguide.md). Hier nur zur Dokumentation. */
   colors: {
-    cream: "#FBF7F1",
-    sand: "#EBDDC9",
-    caramel: "#A67C52",
-    cocoa: "#5E4130",
-    ink: "#2B2018",
-    espresso: "#241912",
+    paper: "#FAF7F2",
+    stone: "#EDE6DC",
+    taupe: "#857262",
+    espresso: "#2B2420",
+    muted: "#5F544C",
   },
 } as const;
 

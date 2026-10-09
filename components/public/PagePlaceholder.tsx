@@ -1,24 +1,17 @@
 import Link from "next/link";
+import { PageIntro } from "@/components/public/PageIntro";
 
 /** Platzhalter für Seiten, die in späteren Phasen mit echtem Inhalt gefüllt werden. */
-export function PagePlaceholder({
-  title,
-  intro,
-  phase,
-}: {
-  title: string;
-  intro: string;
-  phase: string;
-}) {
+export function PagePlaceholder({ title, intro, phase }: { title: string; intro: string; phase: string }) {
   return (
-    <section className="mx-auto w-full max-w-3xl px-5 py-20 md:py-28">
-      <p className="text-sm italic text-cocoa">{phase}</p>
-      <h1 className="mt-3 font-serif text-5xl font-light tracking-[-0.02em] text-ink md:text-6xl">{title}</h1>
-      <p className="mt-6 max-w-xl font-[350] leading-8 text-cocoa">{intro}</p>
-      <Link
-        href="/"
-        className="mt-10 inline-block text-sm tracking-wide text-cocoa underline underline-offset-4 hover:text-ink"
-      >
+    <section className="mx-auto w-full max-w-7xl px-5 py-16 md:px-8 md:py-24">
+      <p className="label text-muted">{phase}</p>
+      <div className="mt-4">
+        <PageIntro title={title}>
+          <p>{intro}</p>
+        </PageIntro>
+      </div>
+      <Link href="/" className="label mt-10 inline-block text-espresso underline underline-offset-4">
         Zur Startseite
       </Link>
     </section>

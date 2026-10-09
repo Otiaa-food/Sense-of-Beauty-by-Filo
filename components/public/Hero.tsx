@@ -1,123 +1,60 @@
 import Image from "next/image";
-import Link from "next/link";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { brand } from "@/lib/brand.config";
-import { formatPrice, lowestPrice, type CatalogGroup } from "@/lib/catalog";
+import { heroMedia } from "@/lib/media";
 
 /**
- * Titelbereich der Startseite.
- * - Mit Foto (brand.hero gesetzt): Foto rechts (Handy: oben), Text links, Kategorien als feine Zeile unten.
- * - tone "light": Vollbild-Foto mit hellem Text (für dunkle Fotos).
- * - Ohne Foto: ruhiger warmer Verlauf.
- * Foto tauschen = Datei in public/brand ablegen und brand.hero in lib/brand.config.ts eintragen.
+ * Titelbereich: Foto oder kurzes Video über die volle Breite, Text unten links in Weiß (wie Lumo).
+ * Medien tauschen: lib/media.ts → heroMedia.
  */
-export function Hero({ groups }: { groups: CatalogGroup[] }) {
-  const hero = brand.hero;
-  const light = hero?.tone === "light";
-  const split = hero !== null && !light;
-
-  const text = light ? "text-cream" : "text-ink";
-  const muted = light ? "text-cream/85" : "text-cocoa";
-  const rule = light ? "border-cream/40" : "border-ink/20";
-
+export function Hero() {
   return (
-    <section className="relative isolate overflow-hidden">
-      {hero ? (
-        <>
-          <div
-            className={
-              light
-                ? "absolute inset-0 -z-20"
-                : "relative h-[62dvh] md:absolute md:inset-y-0 md:right-0 md:-z-20 md:h-auto md:w-[52%]"
-            }
-          >
-            <div className="photo-in absolute inset-0">
-              <Image
-                src={hero.src}
-                alt={hero.alt}
-                fill
-                priority
-                sizes="(min-width: 768px) 52vw, 100vw"
-                className="object-cover"
-                style={{ objectPosition: hero.focus }}
-              />
-            </div>
-          </div>
-          {light ? (
-            <div
-              aria-hidden="true"
-              className="absolute inset-0 -z-10 bg-gradient-to-t from-ink/70 via-ink/25 to-ink/10 md:bg-gradient-to-r md:from-ink/65 md:via-ink/20 md:to-transparent"
-            />
-          ) : (
-            <div
-              aria-hidden="true"
-              className="absolute inset-y-0 left-[48%] -z-10 hidden w-40 md:block"
-              style={{ background: "linear-gradient(to right, var(--cream), transparent)" }}
-            />
-          )}
-        </>
-      ) : (
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute -right-24 top-10 -z-10 h-[28rem] w-[28rem] rounded-full opacity-70 blur-2xl md:right-0 md:h-[36rem] md:w-[36rem]"
-          style={{ background: "radial-gradient(circle at 40% 40%, #EBDDC9 0%, #D9B793 45%, transparent 70%)" }}
-        />
-      )}
+    <section className="relative isolate flex min-h-[calc(100svh-72px)] items-end overflow-hidden bg-espresso">
+      <div className="media-in absolute inset-0 -z-20">
+        {heroMedia.kind === "video" ? (
+          <video
+            className="h-full w-full object-cover"
+            src={heroMedia.src}
+            poster={heroMedia.poster.src}
+            autoPlay
+            muted
+            loop
+            playsInline
+            aria-hidden="true"
+          />
+        ) : (
+          <Image
+            src={heroMedia.src}
+            alt={heroMedia.alt}
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
+            style={{ objectPosition: heroMedia.focus }}
+          />
+        )}
+      </div>
+      {/* Abdunklung unten, damit der Text lesbar bleibt */}
+      <div aria-hidden="true" className="absolute inset-0 -z-10 bg-gradient-to-t from-black/70 via-black/25 to-black/5" />
 
-      <div
-        className={`relative mx-auto flex w-full max-w-6xl flex-col px-5 pb-10 md:min-h-[90dvh] md:justify-center md:pb-14 ${
-          split ? "pt-12 md:pt-20" : light ? "min-h-[88dvh] justify-end pt-24" : "min-h-[78dvh] justify-center pt-20"
-        }`}
-      >
-        <p className={`rise font-serif text-xl italic ${muted}`} style={{ animationDelay: "0.25s" }}>
-          Korean Skincare in {brand.address.city}
-        </p>
-        <h1
-          className={`rise mt-5 font-serif text-[3.4rem] font-light leading-[0.98] tracking-[-0.02em] sm:text-7xl md:text-[5.6rem] ${text} ${
-            split ? "md:max-w-[36rem]" : "max-w-3xl"
-          }`}
-          style={{ animationDelay: "0.45s" }}
-        >
-          Deine Haut darf wieder strahlen.
+      <div className="mx-auto w-full max-w-7xl px-5 pb-14 pt-40 text-white md:px-8 md:pb-20">
+        <p className="text-lg font-medium">Willkommen bei</p>
+        <h1 className="mt-2 text-[3.1rem] font-light lowercase leading-[1] tracking-[-0.01em] sm:text-7xl lg:text-[6.5rem]">
+          {brand.name}
         </h1>
-        <p
-          className={`rise mt-8 max-w-md text-[1.05rem] font-[350] leading-8 ${muted}`}
-          style={{ animationDelay: "0.7s" }}
-        >
-          Bei {brand.fullName} bekommst du eine Korean-Skincare-Behandlung, die zu deiner Haut passt, persönlich
-          abgestimmt und in ruhiger Atmosphäre.
+        <p className="mt-4 text-xl font-light md:text-2xl">{brand.tagline}</p>
+        <p className="mt-6 max-w-xl text-[1.05rem] leading-relaxed text-white/90 md:text-lg">
+          Korean Skincare in {brand.address.city}: Gesichtsbehandlungen mit Wirkstoffkosmetik nach koreanischem
+          Vorbild, persönlich auf deine Haut abgestimmt.
         </p>
-        <div className="rise mt-10 flex flex-wrap items-center gap-x-8 gap-y-3" style={{ animationDelay: "0.9s" }}>
-          <ButtonLink href="/book" variant={light ? "onDark" : "primary"}>
+        <div className="mt-9 flex flex-wrap gap-3">
+          <ButtonLink href="/book" variant="light">
             Termin buchen
           </ButtonLink>
-          <ButtonLink href="/treatments" variant={light ? "onDarkQuiet" : "secondary"}>
-            Behandlungen ansehen
+          <ButtonLink href="/treatments" variant="outlineLight">
+            Behandlungen
           </ButtonLink>
         </div>
-        <p className={`rise mt-5 text-sm ${muted}`} style={{ animationDelay: "1s" }}>
-          Kostenlos stornieren bis {brand.booking.freeCancellationHours} Stunden vor dem Termin.
-        </p>
-
-        {groups.length > 0 ? (
-          <ul className="rise mt-14 grid gap-x-8 gap-y-5 sm:grid-cols-3 md:mt-20" style={{ animationDelay: "1.1s" }}>
-            {groups.map(({ category, services }) => {
-              const from = lowestPrice(services);
-              return (
-                <li key={category.id}>
-                  <Link href={`/treatments#${category.slug}`} className={`group block border-t pt-4 ${rule}`}>
-                    <span className={`block font-serif text-2xl leading-tight transition-colors group-hover:text-caramel ${text}`}>
-                      {category.name}
-                    </span>
-                    {from !== null ? (
-                      <span className={`mt-1 block text-sm ${muted}`}>ab {formatPrice(from)}</span>
-                    ) : null}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        ) : null}
       </div>
     </section>
   );
