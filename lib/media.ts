@@ -80,8 +80,21 @@ export const photos = {
   }),
 };
 
-/** Titelbereich der Startseite. Sobald ein Video da ist: { kind: "video", src: "/media/hero.mp4", poster: … } */
-export const heroMedia: HeroMedia = { kind: "image", ...photos.filoNeon };
+/**
+ * Titelbereich der Startseite: Video von Filos Instagram (10 Sek., ohne Ton).
+ * ACHTUNG: zeigt Kundinnen. Vor dem Livegang muss Filo bestätigen, dass die Kundinnen
+ * der Nutzung auf der Website zugestimmt haben. Sonst Ersatz: { kind: "image", ...photos.glowMood }
+ */
+export const heroMedia: HeroMedia = {
+  kind: "video",
+  src: "/media/hero.mp4",
+  poster: photo({
+    src: "/media/hero-poster.webp",
+    alt: "",
+    width: 1080,
+    height: 1258,
+  }),
+};
 
 /** Ein Foto je Behandlungs-Kategorie (Schlüssel = slug aus der Datenbank). */
 export const categoryPhotos: Record<string, Photo> = {

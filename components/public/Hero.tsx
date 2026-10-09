@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { HeroVideo } from "@/components/public/HeroVideo";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { brand } from "@/lib/brand.config";
 import { heroMedia } from "@/lib/media";
@@ -12,16 +13,7 @@ export function Hero() {
     <section className="relative isolate flex min-h-[calc(100svh-72px)] items-end overflow-hidden bg-espresso">
       <div className="media-in absolute inset-0 -z-20">
         {heroMedia.kind === "video" ? (
-          <video
-            className="h-full w-full object-cover"
-            src={heroMedia.src}
-            poster={heroMedia.poster.src}
-            autoPlay
-            muted
-            loop
-            playsInline
-            aria-hidden="true"
-          />
+          <HeroVideo src={heroMedia.src} poster={heroMedia.poster.src} />
         ) : (
           <Image
             src={heroMedia.src}
