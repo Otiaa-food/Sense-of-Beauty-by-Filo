@@ -51,7 +51,7 @@ eigenes Supabase-Projekt und eigene Schlüssel in `.env.local`.
 1. Projekt-Setup (fertig)
 2. Datenbank (fertig, wartet auf Einspielen in Supabase: `docs/supabase-einrichten.md`)
 3. Öffentliche Website (Design nach Lumo-Vorbild, siehe docs/styleguide.md; Fotos sind Platzhalter)
-4. Buchungsmotor
+4. Buchungsmotor (fertig, braucht SUPABASE_SECRET_KEY bei Vercel)
 5. Admin
 6. E-Mails
 7. Stripe

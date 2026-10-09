@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import { Logo } from "@/components/public/Logo";
 import { MobileMenu } from "@/components/public/MobileMenu";
 import { mainNav } from "@/components/public/nav";
@@ -34,7 +35,10 @@ export function SiteHeader() {
           </Link>
         </nav>
 
-        <MobileMenu />
+        {/* Das Menü liest die aktuelle Adresse. Auf dynamischen Seiten braucht es dafür eine Suspense-Grenze. */}
+        <Suspense fallback={<div className="h-12 w-12 lg:hidden" />}>
+          <MobileMenu />
+        </Suspense>
       </div>
     </header>
   );
