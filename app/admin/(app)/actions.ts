@@ -2,10 +2,12 @@
 
 import { updateTag } from "next/cache";
 import { redirect } from "next/navigation";
+import { after } from "next/server";
 import { z } from "zod";
 import { requireAdmin } from "@/lib/admin/auth";
 import { localToDate } from "@/lib/admin/time";
 import { brand } from "@/lib/brand.config";
+import { notifyBooked, notifyCancelled, notifyRescheduled } from "@/lib/notify/dispatch";
 
 /**
  * Alle Aktionen im Admin-Bereich. Jede prüft zuerst requireAdmin() und arbeitet dann
@@ -98,6 +100,11 @@ export async function createAppointment(_prev: NewAppointmentState, formData: Fo
   if (isOverlap(error)) return { values, message: "Das überschneidet sich mit einem anderen Termin (inklusive Pause). Bitte andere Zeit wählen." };
   if (error || !appt) return { values, message: "Der Termin konnte nicht gespeichert werden." };
 
+  // Bestätigung an die Kundin, wenn sie eine E-Mail hat und Filo das möchte
+  if (formData.get("notify") === "on") {
+    after(() => notifyBooked(appt.id).catch((e) => console.error("Bestätigung fehlgeschlagen:", e)));
+  }
+
   redirect(`/admin/appointments/${appt.id}?meldung=angelegt`);
 }
 
@@ -116,6 +123,9 @@ export async function setAppointmentStatus(formData: FormData) {
     patch.cancel_reason = "Im Admin abgesagt";
   }
   const { error } = await supabase.from("appointments").update(patch).eq("id", id);
+  if (!error && status === "cancelled" && formData.get("notify") === "on") {
+    after(() => notifyCancelled(id, { byCustomer: false }).catch((e) => console.error("Absage-Mail fehlgeschlagen:", e)));
+  }
   // Wieder bestätigen kann an einer Überschneidung scheitern (Zeit inzwischen vergeben)
   back(`/admin/appointments/${id}`, isOverlap(error) ? "ueberschneidung" : error ? "fehler" : "status");
 }
@@ -145,6 +155,9 @@ export async function rescheduleAppointment(formData: FormData) {
       blocked_until: new Date(end.getTime() + buffer).toISOString(),
     })
     .eq("id", id);
+  if (!error && formData.get("notify") === "on") {
+    after(() => notifyRescheduled(id).catch((e) => console.error("Verschiebe-Mail fehlgeschlagen:", e)));
+  }
   back(`/admin/appointments/${id}`, isOverlap(error) ? "ueberschneidung" : error ? "fehler" : "verschoben");
 }
 
@@ -188,6 +201,7 @@ const serviceSchema = z.object({
   price: z.coerce.number().min(0).max(10000),
   duration_minutes: z.coerce.number().int().min(5).max(600),
   buffer_minutes: z.coerce.number().int().min(0).max(240),
+  rebook_after_days: z.union([z.literal(""), z.coerce.number().int().min(7).max(365)]),
 });
 
 export async function saveService(formData: FormData) {
@@ -197,6 +211,7 @@ export async function saveService(formData: FormData) {
     price: String(formData.get("price") ?? "").replace(",", "."),
     duration_minutes: formData.get("duration_minutes"),
     buffer_minutes: formData.get("buffer_minutes"),
+    rebook_after_days: String(formData.get("rebook_after_days") ?? ""),
   });
   if (!parsed.success) back("/admin/services", "ungueltig");
   const s = parsed.data!;
@@ -206,6 +221,7 @@ export async function saveService(formData: FormData) {
       price: s.price,
       duration_minutes: s.duration_minutes,
       buffer_minutes: s.buffer_minutes,
+      rebook_after_days: s.rebook_after_days === "" ? null : s.rebook_after_days,
       online_booking_enabled: formData.get("online_booking_enabled") === "on",
       active: formData.get("active") === "on",
     })

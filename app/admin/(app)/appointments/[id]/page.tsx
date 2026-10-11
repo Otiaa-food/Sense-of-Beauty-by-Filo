@@ -39,10 +39,12 @@ async function Details({ params, searchParams }: Props) {
   const c = a.customers as unknown as { id: string; first_name: string; last_name: string; email: string | null; phone: string | null } | null;
   const local = dateToLocal(a.start_time, brand.timezone);
   const active = a.status === "confirmed" || a.status === "pending";
+  const hasEmail = Boolean(c?.email);
   const statusButton = (status: string, label: string, solid = false) => (
     <form action={setAppointmentStatus}>
       <input type="hidden" name="id" value={a.id} />
       <input type="hidden" name="status" value={status} />
+      {status === "cancelled" && hasEmail ? <input type="hidden" name="notify" value="on" /> : null}
       <button type="submit" className={solid ? btnSolid : btnOutline}>{label}</button>
     </form>
   );
@@ -86,6 +88,7 @@ async function Details({ params, searchParams }: Props) {
       </dl>
 
       <h2 className="mt-10 text-xl font-light text-espresso">Status</h2>
+      {active && hasEmail ? <p className="mt-2 text-sm text-muted">Bei „Absagen“ bekommt die Kundin automatisch eine E-Mail.</p> : null}
       <div className="mt-4 flex flex-wrap gap-2">
         {active ? (
           <>
@@ -106,6 +109,12 @@ async function Details({ params, searchParams }: Props) {
             <label className="block"><span className="label text-muted">Datum</span><input type="date" name="date" required defaultValue={local.date} className={inputClass} /></label>
             <label className="block"><span className="label text-muted">Uhrzeit</span><input type="time" name="time" required step={900} defaultValue={local.time} className={inputClass} /></label>
             <button type="submit" className={btnOutline}>Verschieben</button>
+            {hasEmail ? (
+              <label className="flex min-h-11 w-full items-center gap-3 text-sm text-muted">
+                <input type="checkbox" name="notify" defaultChecked className="h-5 w-5 accent-espresso" />
+                Kundin per E-Mail über die neue Zeit informieren
+              </label>
+            ) : null}
           </form>
         </>
       ) : null}

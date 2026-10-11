@@ -11,7 +11,8 @@ Danach hat deine Datenbank alle Tabellen, die Sicherheitsregeln und Filos Behand
 ## Schritt 1: Skripte nacheinander ausführen
 
 Öffne dein Projekt auf supabase.com, dann links **SQL Editor**, dann **New query**.
-Füge nacheinander diese drei Dateien aus dem GitHub-Repository ein. **Die Reihenfolge ist wichtig.**
+Füge nacheinander diese Dateien aus dem GitHub-Repository ein. **Die Reihenfolge ist wichtig:**
+zuerst alle Dateien aus `supabase/migrations` (nach Datum sortiert), danach `supabase/seed.sql`.
 
 | Reihenfolge | Datei | Was sie macht |
 | --- | --- | --- |

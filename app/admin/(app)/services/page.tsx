@@ -25,6 +25,7 @@ type Service = {
   price: number;
   duration_minutes: number;
   buffer_minutes: number;
+  rebook_after_days: number | null;
   online_booking_enabled: boolean;
   addon_only: boolean;
   active: boolean;
@@ -36,7 +37,7 @@ async function List({ searchParams }: Props) {
   const { meldung } = await searchParams;
   const { data } = await supabase
     .from("services")
-    .select("id, name, price, duration_minutes, buffer_minutes, online_booking_enabled, addon_only, active, sort_order, service_categories(name, sort_order)")
+    .select("id, name, price, duration_minutes, buffer_minutes, rebook_after_days, online_booking_enabled, addon_only, active, sort_order, service_categories(name, sort_order)")
     .order("sort_order");
   const services = (data ?? []) as unknown as Service[];
   const categories = [...new Set(services.map((s) => s.service_categories?.name ?? "Weitere"))];
@@ -46,7 +47,8 @@ async function List({ searchParams }: Props) {
       <Flash code={meldung} />
       <p className="mb-8 max-w-2xl text-muted">
         Änderungen an Preis, Dauer und Pause erscheinen sofort auf der Website und gelten für neue Buchungen. Bestehende
-        Termine behalten ihren Preis und ihre Dauer.
+        Termine behalten ihren Preis und ihre Dauer. „Erinnern nach Tagen“: So lange nach einem Besuch bekommt die
+        Kundin eine E-Mail „Zeit für deine nächste Behandlung?“ (nur mit ihrer Einwilligung, leer = nie).
       </p>
       <div className="space-y-10">
         {categories.map((cat) => (
@@ -64,6 +66,7 @@ async function List({ searchParams }: Props) {
                         <label className="block w-24"><span className="label !text-[0.6rem] text-muted">Preis €</span><input name="price" inputMode="decimal" defaultValue={Number(s.price)} className={inputClass} /></label>
                         <label className="block w-24"><span className="label !text-[0.6rem] text-muted">Dauer Min.</span><input name="duration_minutes" type="number" min={5} step={5} defaultValue={s.duration_minutes} className={inputClass} /></label>
                         <label className="block w-24"><span className="label !text-[0.6rem] text-muted">Pause Min.</span><input name="buffer_minutes" type="number" min={0} step={5} defaultValue={s.buffer_minutes} className={inputClass} /></label>
+                        <label className="block w-28"><span className="label !text-[0.6rem] text-muted">Erinnern nach Tagen</span><input name="rebook_after_days" type="number" min={7} max={365} defaultValue={s.rebook_after_days ?? ""} placeholder="nie" className={inputClass} /></label>
                         <label className="flex min-h-11 items-center gap-2 text-sm text-muted">
                           <input type="checkbox" name="online_booking_enabled" defaultChecked={s.online_booking_enabled} disabled={s.addon_only} className="h-5 w-5 accent-espresso" />
                           Online buchbar

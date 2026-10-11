@@ -1,8 +1,10 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { after } from "next/server";
 import { parseBooking, type BookingFormState } from "@/lib/booking/schema";
 import { bookingConfigured, isSlotFree, loadBookableService } from "@/lib/booking/server";
+import { notifyBooked } from "@/lib/notify/dispatch";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 const messages: Record<string, string> = {
@@ -57,6 +59,8 @@ export async function createBooking(_prev: BookingFormState, formData: FormData)
     return { ok: false, values, message: key ? messages[key] : "Etwas ist schiefgelaufen. Bitte versuche es noch einmal." };
   }
 
-  const token = (data as { manage_token: string }).manage_token;
-  redirect(`/termin/${token}?neu=1`);
+  const created = data as { id: string; manage_token: string };
+  // E-Mails erst nach der Antwort verschicken: die Kundin wartet nicht darauf
+  after(() => notifyBooked(created.id).catch((e) => console.error("Bestätigung fehlgeschlagen:", e)));
+  redirect(`/termin/${created.manage_token}?neu=1`);
 }

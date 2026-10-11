@@ -48,10 +48,10 @@ export function canCancel(appt: Pick<ManagedAppointment, "start_time" | "status"
   );
 }
 
-export async function cancelByToken(token: string): Promise<"cancelled" | "too_late" | "not_found"> {
+export async function cancelByToken(token: string): Promise<{ result: "cancelled" | "too_late" | "not_found"; id?: string }> {
   const appt = await loadByToken(token);
-  if (!appt) return "not_found";
-  if (!canCancel(appt)) return "too_late";
+  if (!appt) return { result: "not_found" };
+  if (!canCancel(appt)) return { result: "too_late" };
   const admin = createAdminClient();
   const { error } = await admin
     .from("appointments")
@@ -59,5 +59,5 @@ export async function cancelByToken(token: string): Promise<"cancelled" | "too_l
     .eq("id", appt.id)
     .in("status", ["confirmed", "pending"]);
   if (error) throw error;
-  return "cancelled";
+  return { result: "cancelled", id: appt.id };
 }

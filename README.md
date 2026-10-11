@@ -53,7 +53,7 @@ eigenes Supabase-Projekt und eigene Schlüssel in `.env.local`.
 3. Öffentliche Website (Design nach Lumo-Vorbild, siehe docs/styleguide.md; Fotos sind Platzhalter)
 4. Buchungsmotor (fertig, braucht SUPABASE_SECRET_KEY bei Vercel)
 5. Admin (fertig, Einrichtung: docs/admin-einrichten.md)
-6. E-Mails
+6. E-Mails und SMS (fertig, Einrichtung: docs/nachrichten-einrichten.md)
 7. Stripe
 8. Bewertungen
 9. Planity-Import

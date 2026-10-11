@@ -74,6 +74,11 @@ export function NewAppointmentForm({ services, customer, day }: { services: Serv
         </label>
       </fieldset>
 
+      <label className="flex items-center gap-3 text-sm text-muted">
+        <input type="checkbox" name="notify" defaultChecked className="h-5 w-5 accent-espresso" />
+        Bestätigung per E-Mail an die Kundin schicken (falls E-Mail bekannt)
+      </label>
+
       <button type="submit" disabled={pending} className={`${btnSolid} disabled:opacity-60`}>
         {pending ? "Wird gespeichert …" : "Termin eintragen"}
       </button>

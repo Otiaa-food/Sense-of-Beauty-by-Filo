@@ -70,6 +70,12 @@ lines.push(
   "join public.service_categories c on c.slug = v.category_slug",
   "on conflict (slug) do nothing;",
   "",
+  "-- Nachbuchungs-Erinnerung: nach wie vielen Tagen (je Kategorie, im Admin änderbar)",
+  "update public.services s set rebook_after_days = case c.slug",
+  "    when 'korean-facials' then 35 when 'laser-damen' then 42 when 'lashes' then 42 end",
+  "from public.service_categories c",
+  "where c.id = s.category_id and not s.addon_only and s.rebook_after_days is null;",
+  "",
 );
 
 // ---------- Arbeitszeiten (Anzeige von Filo, bitte von ihr bestätigen lassen) ----------
@@ -101,6 +107,8 @@ const settings = [
   ["booking_min_notice_hours", 12, true],
   ["booking_max_days_ahead", 60, true],
   ["cancellation_hours", 24, true],
+  ["google_review_url", "https://share.google/wrzWTSz1nPj8REkX0", false],
+  ["sms_reminders_enabled", true, false],
 ];
 
 lines.push(

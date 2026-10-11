@@ -43,6 +43,12 @@ from (values
 join public.service_categories c on c.slug = v.category_slug
 on conflict (slug) do nothing;
 
+-- Nachbuchungs-Erinnerung: nach wie vielen Tagen (je Kategorie, im Admin änderbar)
+update public.services s set rebook_after_days = case c.slug
+    when 'korean-facials' then 35 when 'laser-damen' then 42 when 'lashes' then 42 end
+from public.service_categories c
+where c.id = s.category_id and not s.addon_only and s.rebook_after_days is null;
+
 -- Arbeitszeiten laut Filo (0 = Sonntag). Samstag und Sonntag geschlossen.
 -- Eine Mittagspause ist nicht bekannt. Sie wird später im Admin als zwei Zeitfenster eingetragen.
 insert into public.availability_rules (day_of_week, start_time, end_time)
@@ -66,5 +72,7 @@ insert into public.settings (key, value, is_public) values
   ('slot_interval_minutes', '15'::jsonb, true),
   ('booking_min_notice_hours', '12'::jsonb, true),
   ('booking_max_days_ahead', '60'::jsonb, true),
-  ('cancellation_hours', '24'::jsonb, true)
+  ('cancellation_hours', '24'::jsonb, true),
+  ('google_review_url', '"https://share.google/wrzWTSz1nPj8REkX0"'::jsonb, false),
+  ('sms_reminders_enabled', 'true'::jsonb, false)
 on conflict (key) do nothing;

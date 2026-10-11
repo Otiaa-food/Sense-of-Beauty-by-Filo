@@ -74,6 +74,7 @@ beforeAll(async () => {
   await db.exec(read("supabase/migrations/20261008000001_schema.sql"));
   await db.exec(read("supabase/migrations/20261008000002_security.sql"));
   await db.exec(read("supabase/migrations/20261009000003_admin.sql"));
+  await db.exec(read("supabase/migrations/20261011000004_notifications.sql"));
   await db.exec(read("supabase/seed.sql"));
 
   await db.exec(`insert into auth.users (id) values ('${ADMIN_ID}'), ('${OTHER_ID}');`);
@@ -459,6 +460,31 @@ describe("Admin-Bereich (Phase 5)", () => {
           [cust.id, svc.id],
         ),
       ),
+    ).rejects.toThrow();
+  });
+});
+
+describe("Nachrichten (Phase 6)", () => {
+  it("setzt Nachbuchungs-Abstände je Kategorie und lässt Zusatzleistungen leer", async () => {
+    const facial = await one<{ d: number }>("select rebook_after_days as d from public.services where slug = 'korean-glass-skin-aquafacial'");
+    expect(facial.d).toBe(35);
+    const addon = await one<{ d: number | null }>("select rebook_after_days as d from public.services where addon_only");
+    expect(addon.d).toBeNull();
+  });
+
+  it("verschickt jede Nachricht je Kanal nur einmal", async () => {
+    const appt = await one<{ id: string }>("select id from public.appointments limit 1");
+    const ins = (channel: string) =>
+      db.query(
+        `insert into public.notifications (appointment_id, type, channel, scheduled_at)
+         values ($1, 'reminder', $2, '2027-01-01T10:00:00Z') on conflict do nothing returning id`,
+        [appt.id, channel],
+      );
+    expect((await ins("email")).rows).toHaveLength(1);
+    expect((await ins("email")).rows).toHaveLength(0); // doppelt: nichts passiert
+    expect((await ins("sms")).rows).toHaveLength(1); // anderer Kanal: erlaubt
+    await expect(
+      db.query(`insert into public.notifications (appointment_id, type, scheduled_at) values ($1, 'quatsch', now())`, [appt.id]),
     ).rejects.toThrow();
   });
 });

@@ -11,13 +11,18 @@ it("bringt die alte Datenbank mit dem Update-Skript auf den Stand der neuen Star
   await db.exec(read("supabase/migrations/20261008000001_schema.sql"));
   await db.exec(readFileSync(new URL("./seed-before-update.sql", import.meta.url), "utf8"));
   await db.exec(read("supabase/updates/20261008_kontakt_puffer_ruecken.sql"));
+  // spätere Migrationen wie in der echten Datenbank danach
+  await db.exec(read("supabase/migrations/20261009000003_admin.sql"));
+  await db.exec(read("supabase/migrations/20261011000004_notifications.sql"));
 
   const fresh = new PGlite();
   await fresh.exec("create schema auth; create table auth.users (id uuid primary key);");
   await fresh.exec(read("supabase/migrations/20261008000001_schema.sql"));
+  await fresh.exec(read("supabase/migrations/20261009000003_admin.sql"));
+  await fresh.exec(read("supabase/migrations/20261011000004_notifications.sql"));
   await fresh.exec(read("supabase/seed.sql"));
 
-  const q = `select slug, price::text, buffer_minutes, online_booking_enabled, sort_order from public.services order by slug`;
+  const q = `select slug, price::text, buffer_minutes, online_booking_enabled, sort_order, rebook_after_days from public.services order by slug`;
   expect((await db.query(q)).rows).toEqual((await fresh.query(q)).rows);
   const s = `select key, value from public.settings order by key`;
   expect((await db.query(s)).rows).toEqual((await fresh.query(s)).rows);
