@@ -19,7 +19,11 @@ export async function requireAdmin() {
   if (!user) redirect("/admin/login");
 
   const { data: isAdmin, error } = await supabase.rpc("is_admin");
-  if (error || !isAdmin) redirect("/admin/login?fehler=kein-zugang");
+  if (error) {
+    console.error("Admin-Prüfung fehlgeschlagen:", error);
+    redirect("/admin/login?fehler=pruefung");
+  }
+  if (!isAdmin) redirect("/admin/login?fehler=kein-zugang");
 
   return { supabase, user };
 }
