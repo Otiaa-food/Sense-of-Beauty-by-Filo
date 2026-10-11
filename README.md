@@ -55,6 +55,6 @@ eigenes Supabase-Projekt und eigene Schlüssel in `.env.local`.
 5. Admin (fertig, Einrichtung: docs/admin-einrichten.md)
 6. E-Mails und SMS (fertig, Einrichtung: docs/nachrichten-einrichten.md)
 7. Stripe
-8. Bewertungen
+8. Bewertungen (fertig, Migration 20261011000005_reviews.sql)
 9. Planity-Import
 10. Feinschliff

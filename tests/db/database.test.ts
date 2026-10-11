@@ -75,6 +75,7 @@ beforeAll(async () => {
   await db.exec(read("supabase/migrations/20261008000002_security.sql"));
   await db.exec(read("supabase/migrations/20261009000003_admin.sql"));
   await db.exec(read("supabase/migrations/20261011000004_notifications.sql"));
+  await db.exec(read("supabase/migrations/20261011000005_reviews.sql"));
   await db.exec(read("supabase/seed.sql"));
 
   await db.exec(`insert into auth.users (id) values ('${ADMIN_ID}'), ('${OTHER_ID}');`);
@@ -346,9 +347,9 @@ describe("Zugriffsschutz (Row Level Security)", () => {
 
   it("zeigt Besucherinnen nur freigegebene Stimmen", async () => {
     await db.exec(
-      `insert into public.reviews (author_name, rating, text, source, visible) values
-         ('Sichtbar S.', 5, 'Toll', 'manual', true),
-         ('Versteckt V.', 4, 'Noch nicht freigegeben', 'planity', false)`,
+      `insert into public.reviews (author_name, rating, text, source, visible, consent_confirmed_at) values
+         ('Sichtbar S.', 5, 'Toll', 'manual', true, now()),
+         ('Versteckt V.', 4, 'Noch nicht freigegeben', 'planity', false, null)`,
     );
     const rows = await as("anon", null, async () => (await db.query<{ author_name: string }>("select author_name from public.reviews")).rows);
     expect(rows.map((r) => r.author_name)).toEqual(["Sichtbar S."]);
@@ -422,7 +423,7 @@ describe("Zugriffsschutz (Row Level Security)", () => {
     expect(inactive).toHaveLength(1); // Admin sieht auch inaktive Behandlungen
 
     await as("authenticated", ADMIN_ID, () =>
-      db.query("update public.reviews set visible = true where author_name = 'Neu N.'"),
+      db.query("update public.reviews set visible = true, consent_confirmed_at = now() where author_name = 'Neu N.'"),
     );
     const done = await one<{ visible: boolean }>("select visible from public.reviews where author_name = 'Neu N.'");
     expect(done.visible).toBe(true);
@@ -486,5 +487,26 @@ describe("Nachrichten (Phase 6)", () => {
     await expect(
       db.query(`insert into public.notifications (appointment_id, type, scheduled_at) values ($1, 'quatsch', now())`, [appt.id]),
     ).rejects.toThrow();
+  });
+});
+
+describe("Bewertungen (Phase 8)", () => {
+  it("zeigt Zitate nur mit Einwilligung", async () => {
+    await expect(
+      db.query("insert into public.reviews (author_name, rating, text, source, visible) values ('Anna K.', 5, 'Toll', 'google', true)"),
+    ).rejects.toThrow(/reviews_visible_needs_consent/);
+    await expect(
+      db.query(
+        "insert into public.reviews (author_name, rating, text, source, visible, consent_confirmed_at) values ('Anna K.', 5, 'Toll', 'google', true, now())",
+      ),
+    ).resolves.toBeDefined();
+  });
+
+  it("Besucher sehen nur freigegebene Zitate und die öffentliche Übersicht", async () => {
+    await db.query("insert into public.reviews (author_name, rating, text, source) values ('Versteckt', 4, 'x', 'manual')");
+    const visible = await as("anon", null, async () => (await db.query<{ author_name: string }>("select author_name from public.reviews")).rows);
+    expect(visible.map((r) => r.author_name)).not.toContain("Versteckt");
+    const summary = await as("anon", null, async () => (await db.query("select key from public.settings where key = 'review_summary'")).rows);
+    expect(summary).toHaveLength(1);
   });
 });

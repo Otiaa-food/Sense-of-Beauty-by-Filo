@@ -272,3 +272,91 @@ export async function deleteBlocked(formData: FormData) {
   const { error } = await supabase.from("blocked_times").delete().eq("id", id);
   back("/admin/availability", error ? "fehler" : "geloescht");
 }
+
+// ---------- Bewertungen ----------
+
+const rating = z.coerce.number().min(1).max(5);
+const optionalRating = z.union([z.literal(""), rating]);
+const optionalCount = z.union([z.literal(""), z.coerce.number().int().min(0).max(100000)]);
+
+export async function saveReviewSummary(formData: FormData) {
+  const { supabase } = await requireAdmin();
+  const get = (k: string) => String(formData.get(k) ?? "").trim().replace(",", ".");
+  const parsed = z
+    .object({
+      google_rating: optionalRating,
+      google_count: optionalCount,
+      planity_rating: optionalRating,
+      planity_count: optionalCount,
+      planity_url: z.union([z.literal(""), z.url()]),
+    })
+    .safeParse({
+      google_rating: get("google_rating"),
+      google_count: get("google_count"),
+      planity_rating: get("planity_rating"),
+      planity_count: get("planity_count"),
+      planity_url: String(formData.get("planity_url") ?? "").trim(),
+    });
+  if (!parsed.success) back("/admin/reviews", "ungueltig");
+  const v = parsed.data!;
+  const n = (x: number | "") => (x === "" ? null : x);
+  const { error } = await supabase.from("settings").upsert({
+    key: "review_summary",
+    is_public: true,
+    value: {
+      google: { rating: n(v.google_rating), count: n(v.google_count) },
+      planity: { rating: n(v.planity_rating), count: n(v.planity_count), url: v.planity_url },
+    },
+  });
+  updateTag("reviews");
+  back("/admin/reviews", error ? "fehler" : "gespeichert");
+}
+
+export async function addReview(formData: FormData) {
+  const { supabase } = await requireAdmin();
+  const parsed = z
+    .object({
+      author_name: z.string().trim().min(1).max(80),
+      rating,
+      text: z.string().trim().max(1200),
+      source: z.enum(["google", "planity", "manual"]),
+      review_date: z.union([z.literal(""), z.string().regex(/^\d{4}-\d{2}-\d{2}$/)]),
+    })
+    .safeParse(Object.fromEntries(formData));
+  if (!parsed.success) back("/admin/reviews", "ungueltig");
+  const v = parsed.data!;
+  const consent = formData.get("consent") === "on";
+  const { error } = await supabase.from("reviews").insert({
+    author_name: v.author_name,
+    rating: Math.round(v.rating),
+    text: v.text || null,
+    source: v.source,
+    review_date: v.review_date || null,
+    consent_confirmed_at: consent ? new Date().toISOString() : null,
+    visible: consent && formData.get("visible") === "on",
+  });
+  updateTag("reviews");
+  back("/admin/reviews", error ? "fehler" : "gespeichert");
+}
+
+export async function setReviewVisible(formData: FormData) {
+  const { supabase } = await requireAdmin();
+  const id = String(formData.get("id"));
+  if (!uuid.safeParse(id).success) back("/admin/reviews", "ungueltig");
+  const visible = formData.get("visible") === "true";
+  const patch: Record<string, unknown> = { visible };
+  // Einwilligung bestätigen, wenn Filo sie beim Freigeben angehakt hat
+  if (visible && formData.get("consent") === "on") patch.consent_confirmed_at = new Date().toISOString();
+  const { error } = await supabase.from("reviews").update(patch).eq("id", id);
+  updateTag("reviews");
+  back("/admin/reviews", error ? (visible ? "einwilligung" : "fehler") : "gespeichert");
+}
+
+export async function deleteReview(formData: FormData) {
+  const { supabase } = await requireAdmin();
+  const id = String(formData.get("id"));
+  if (!uuid.safeParse(id).success) back("/admin/reviews", "ungueltig");
+  const { error } = await supabase.from("reviews").delete().eq("id", id);
+  updateTag("reviews");
+  back("/admin/reviews", error ? "fehler" : "geloescht");
+}

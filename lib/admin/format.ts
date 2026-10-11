@@ -36,5 +36,6 @@ export const flashMessages: Record<string, { text: string; error?: boolean }> = 
   geloescht: { text: "Entfernt." },
   ueberschneidung: { text: "Das überschneidet sich mit einem anderen Termin (inklusive Pause). Bitte andere Zeit wählen.", error: true },
   ungueltig: { text: "Bitte Eingaben prüfen.", error: true },
+  einwilligung: { text: "Freigeben geht nur, wenn die Einwilligung der Kundin bestätigt ist.", error: true },
   fehler: { text: "Das hat nicht geklappt. Bitte noch einmal versuchen.", error: true },
 };

@@ -2,11 +2,14 @@ import Link from "next/link";
 import { CatalogUnavailable } from "@/components/public/CatalogUnavailable";
 import { Hero } from "@/components/public/Hero";
 import { PhotoFill } from "@/components/public/PhotoFill";
+import { ReviewQuotes, ReviewSummaryRow } from "@/components/public/Reviews";
 import { SocialGrid } from "@/components/public/SocialGrid";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { brand, mapsDirectionsUrl } from "@/lib/brand.config";
 import { formatPrice, groupCatalog, lowestPrice } from "@/lib/catalog";
 import { getCatalog } from "@/lib/data/catalog";
+import { getReviews } from "@/lib/data/reviews";
+import { hasSummary } from "@/lib/reviews";
 import { categoryPhotos, homeStrip, photos } from "@/lib/media";
 
 const steps = [
@@ -25,8 +28,9 @@ const steps = [
 ];
 
 export default async function HomePage() {
-  const catalog = await getCatalog();
+  const [catalog, { reviews, summary }] = await Promise.all([getCatalog(), getReviews()]);
   const groups = catalog.ok ? groupCatalog(catalog.categories, catalog.services) : [];
+  const showReviews = reviews.length > 0 || hasSummary(summary.google) || hasSummary(summary.planity);
 
   return (
     <>
@@ -110,6 +114,20 @@ export default async function HomePage() {
           </div>
         ))}
       </div>
+
+      {/* Stimmen: nur wenn Filo Bewertungen gepflegt hat */}
+      {showReviews ? (
+        <section className="mt-20 bg-stone py-20 md:mt-28 md:py-28">
+          <div className="mx-auto flex max-w-7xl flex-wrap items-end justify-between gap-4 px-5 md:px-8">
+            <h2 className="text-[2.2rem] font-light leading-tight text-espresso md:text-5xl">Das sagen Kundinnen</h2>
+            <ButtonLink href="/reviews" variant="outline">Alle Stimmen</ButtonLink>
+          </div>
+          <div className="mx-auto mt-10 max-w-7xl space-y-1.5 px-1.5 sm:px-5 md:px-8">
+            <ReviewSummaryRow summary={summary} googleUrl={brand.contact.googleBusinessUrl} />
+            <ReviewQuotes reviews={reviews.slice(0, 3)} />
+          </div>
+        </section>
+      ) : null}
 
       {/* So läuft dein Termin (echte Abfolge, daher nummeriert) */}
       <section className="mx-auto max-w-7xl px-5 py-20 md:px-8 md:py-28">
