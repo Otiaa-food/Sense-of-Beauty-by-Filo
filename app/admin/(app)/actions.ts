@@ -5,9 +5,11 @@ import { redirect } from "next/navigation";
 import { after } from "next/server";
 import { z } from "zod";
 import { requireAdmin } from "@/lib/admin/auth";
-import { localToDate } from "@/lib/admin/time";
+import { dateToLocal, localToDate } from "@/lib/admin/time";
 import { brand } from "@/lib/brand.config";
 import { notifyBooked, notifyCancelled, notifyRescheduled } from "@/lib/notify/dispatch";
+import { offerCancelledAppointment, offerFreedTimes, sendCampaign } from "@/lib/notify/outreach";
+import { emailConfigured, smsConfigured } from "@/lib/notify/send";
 
 /**
  * Alle Aktionen im Admin-Bereich. Jede prüft zuerst requireAdmin() und arbeitet dann
@@ -126,6 +128,9 @@ export async function setAppointmentStatus(formData: FormData) {
   if (!error && status === "cancelled" && formData.get("notify") === "on") {
     after(() => notifyCancelled(id, { byCustomer: false }).catch((e) => console.error("Absage-Mail fehlgeschlagen:", e)));
   }
+  if (!error && status === "cancelled") {
+    after(() => offerCancelledAppointment(id).catch((e) => console.error("Warteliste fehlgeschlagen:", e)));
+  }
   // Wieder bestätigen kann an einer Überschneidung scheitern (Zeit inzwischen vergeben)
   back(`/admin/appointments/${id}`, isOverlap(error) ? "ueberschneidung" : error ? "fehler" : "status");
 }
@@ -158,6 +163,12 @@ export async function rescheduleAppointment(formData: FormData) {
   if (!error && formData.get("notify") === "on") {
     after(() => notifyRescheduled(id).catch((e) => console.error("Verschiebe-Mail fehlgeschlagen:", e)));
   }
+  if (!error) {
+    // Die alte Zeit ist jetzt frei: Warteliste für diesen Tag prüfen
+    const oldDay = dateToLocal(appt!.start_time, tz).date;
+    const reason = `verschoben:${id}:${start!.toISOString()}`;
+    after(() => offerFreedTimes(oldDay, reason).catch((e) => console.error("Warteliste fehlgeschlagen:", e)));
+  }
   back(`/admin/appointments/${id}`, isOverlap(error) ? "ueberschneidung" : error ? "fehler" : "verschoben");
 }
 
@@ -179,17 +190,34 @@ const customerSchema = z.object({
   email: z.union([z.email(), z.literal("")]),
   phone: z.string().trim().max(30),
   notes: z.string().trim().max(5000),
+  birthday_day: z.union([z.literal(""), z.coerce.number().int().min(1).max(31)]),
+  birthday_month: z.union([z.literal(""), z.coerce.number().int().min(1).max(12)]),
 });
 
 export async function saveCustomer(formData: FormData) {
   const { supabase } = await requireAdmin();
-  const parsed = customerSchema.safeParse(Object.fromEntries(formData));
+  const raw = Object.fromEntries(formData);
+  const parsed = customerSchema.safeParse({ birthday_day: "", birthday_month: "", ...raw });
   const id = String(formData.get("id"));
   if (!parsed.success) back(`/admin/customers/${id}`, "ungueltig");
   const c = parsed.data!;
+  // Geburtstag nur vollständig (Tag und Monat) oder gar nicht
+  const birthday = c.birthday_day !== "" && c.birthday_month !== "";
+  const { data: before } = await supabase.from("customers").select("marketing_consent").eq("id", c.id).maybeSingle();
+  const marketing = formData.get("marketing_consent") === "on";
   const { error } = await supabase
     .from("customers")
-    .update({ first_name: c.first_name, last_name: c.last_name, email: c.email || null, phone: c.phone || null, notes: c.notes || null })
+    .update({
+      first_name: c.first_name,
+      last_name: c.last_name,
+      email: c.email || null,
+      phone: c.phone || null,
+      notes: c.notes || null,
+      birthday_day: birthday ? c.birthday_day : null,
+      birthday_month: birthday ? c.birthday_month : null,
+      marketing_consent: marketing,
+      ...(marketing !== before?.marketing_consent ? { marketing_consent_at: marketing ? new Date().toISOString() : null } : {}),
+    })
     .eq("id", c.id);
   back(`/admin/customers/${c.id}`, error ? "fehler" : "gespeichert");
 }
@@ -359,4 +387,91 @@ export async function deleteReview(formData: FormData) {
   const { error } = await supabase.from("reviews").delete().eq("id", id);
   updateTag("reviews");
   back("/admin/reviews", error ? "fehler" : "geloescht");
+}
+
+// ---------- Warteliste ----------
+
+export async function removeWaitlistEntry(formData: FormData) {
+  const { supabase } = await requireAdmin();
+  const id = String(formData.get("id"));
+  if (!uuid.safeParse(id).success) back("/admin/warteliste", "ungueltig");
+  const { error } = await supabase.from("waitlist").update({ status: "removed" }).eq("id", id);
+  back("/admin/warteliste", error ? "fehler" : "geloescht");
+}
+
+/** Filo hat selbst etwas frei gemacht (z. B. Pause gestrichen): Warteliste für den Tag jetzt prüfen */
+export async function checkWaitlistDay(formData: FormData) {
+  await requireAdmin();
+  const day = String(formData.get("day") ?? "");
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) back("/admin/warteliste", "ungueltig");
+  const count = await offerFreedTimes(day, `manuell:${Date.now()}`).catch((e) => {
+    console.error("Warteliste fehlgeschlagen:", e);
+    return -1;
+  });
+  back("/admin/warteliste", count < 0 ? "fehler" : count === 0 ? "nichtsfrei" : "benachrichtigt");
+}
+
+// ---------- Kampagnen ----------
+
+const birthdaySchema = z.object({
+  channel: z.enum(["email", "sms", "both"]),
+  gift: z.string().trim().min(3).max(120),
+  code: z.string().trim().max(30),
+  validDays: z.coerce.number().int().min(1).max(365),
+});
+
+export async function saveBirthdayCampaign(formData: FormData) {
+  const { supabase } = await requireAdmin();
+  const parsed = birthdaySchema.safeParse(Object.fromEntries(formData));
+  if (!parsed.success) back("/admin/kampagnen", "ungueltig");
+  const value = { enabled: formData.get("enabled") === "on", ...parsed.data! };
+  const { error } = await supabase.from("settings").update({ value }).eq("key", "birthday_campaign");
+  back("/admin/kampagnen", error ? "fehler" : "gespeichert");
+}
+
+const campaignSchema = z
+  .object({
+    channel: z.enum(["email", "sms"]),
+    subject: z.string().trim().max(120),
+    body: z.string().trim().min(1).max(5000),
+  })
+  .refine((c) => c.channel === "sms" || c.subject.length > 0, { path: ["subject"] })
+  .refine((c) => c.channel === "email" || c.body.length <= 300, { path: ["body"] });
+
+/** Schritt 1: Rundnachricht als Entwurf speichern (noch nichts wird verschickt) */
+export async function createCampaign(formData: FormData) {
+  const { supabase } = await requireAdmin();
+  const parsed = campaignSchema.safeParse(Object.fromEntries(formData));
+  if (!parsed.success) back("/admin/kampagnen", "ungueltig");
+  const c = parsed.data!;
+  const { data, error } = await supabase
+    .from("campaigns")
+    .insert({ channel: c.channel, subject: c.channel === "email" ? c.subject : null, body: c.body })
+    .select("id")
+    .single();
+  if (error || !data) back("/admin/kampagnen", "fehler");
+  redirect(`/admin/kampagnen/${data!.id}`);
+}
+
+/** Schritt 2: nach Kontrolle der Vorschau wirklich verschicken */
+export async function sendCampaignNow(formData: FormData) {
+  const { supabase } = await requireAdmin();
+  const id = String(formData.get("id"));
+  if (!uuid.safeParse(id).success || formData.get("confirm") !== "on") back(`/admin/kampagnen/${id}`, "bestaetigen");
+  const { data } = await supabase.from("campaigns").select("sent_at, channel").eq("id", id).maybeSingle();
+  if (!data) back("/admin/kampagnen", "fehler");
+  if (data!.sent_at) back(`/admin/kampagnen/${id}`, "schonversendet");
+  if (data!.channel === "email" ? !emailConfigured() : !smsConfigured()) back(`/admin/kampagnen/${id}`, "nichteingerichtet");
+  // Versand läuft nach der Antwort weiter, die Seite zeigt den Fortschritt
+  await supabase.from("campaigns").update({ sent_at: new Date().toISOString() }).eq("id", id);
+  after(() => sendCampaign(id).catch((e) => console.error("Rundnachricht fehlgeschlagen:", e)));
+  back(`/admin/kampagnen/${id}`, "versendet");
+}
+
+export async function deleteCampaign(formData: FormData) {
+  const { supabase } = await requireAdmin();
+  const id = String(formData.get("id"));
+  if (!uuid.safeParse(id).success) back("/admin/kampagnen", "ungueltig");
+  const { error } = await supabase.from("campaigns").delete().eq("id", id).is("sent_at", null);
+  back("/admin/kampagnen", error ? "fehler" : "geloescht");
 }

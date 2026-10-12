@@ -14,6 +14,8 @@ export const bookingSchema = z.object({
   notes: z.string().trim().max(500, "Bitte fasse dich kürzer (höchstens 500 Zeichen).").optional().default(""),
   terms: z.literal("on", { message: "Bitte bestätige die Stornierungsbedingungen und den Datenschutzhinweis." }),
   marketing: z.literal("on").optional(),
+  birthdayDay: z.union([z.literal(""), z.coerce.number().int().min(1).max(31)]).optional().default(""),
+  birthdayMonth: z.union([z.literal(""), z.coerce.number().int().min(1).max(12)]).optional().default(""),
   // Spam-Schutz: unsichtbares Feld muss leer bleiben, Formular darf nicht in unter 3 Sekunden abgeschickt werden
   website: z.string().max(0).optional().default(""),
   renderedAt: z.coerce.number(),
@@ -25,12 +27,12 @@ export type BookingFormState = {
   ok: false;
   message?: string;
   fieldErrors?: Partial<Record<keyof BookingInput, string>>;
-  values?: Partial<Record<"firstName" | "lastName" | "email" | "phone" | "notes", string>>;
+  values?: Partial<Record<"firstName" | "lastName" | "email" | "phone" | "notes" | "birthdayDay" | "birthdayMonth", string>>;
 };
 
 export function parseBooking(formData: FormData, now = Date.now()) {
   const raw = Object.fromEntries(
-    ["service", "start", "firstName", "lastName", "email", "phone", "notes", "terms", "marketing", "website", "renderedAt"].map(
+    ["service", "start", "firstName", "lastName", "email", "phone", "notes", "terms", "marketing", "birthdayDay", "birthdayMonth", "website", "renderedAt"].map(
       (k) => [k, formData.get(k) ?? undefined],
     ),
   );

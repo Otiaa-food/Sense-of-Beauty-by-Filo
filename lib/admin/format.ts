@@ -37,5 +37,11 @@ export const flashMessages: Record<string, { text: string; error?: boolean }> = 
   ueberschneidung: { text: "Das überschneidet sich mit einem anderen Termin (inklusive Pause). Bitte andere Zeit wählen.", error: true },
   ungueltig: { text: "Bitte Eingaben prüfen.", error: true },
   einwilligung: { text: "Freigeben geht nur, wenn die Einwilligung der Kundin bestätigt ist.", error: true },
+  benachrichtigt: { text: "Passende Kundinnen auf der Warteliste wurden benachrichtigt." },
+  nichtsfrei: { text: "Für niemanden auf der Warteliste ist an diesem Tag gerade eine passende Zeit frei." },
+  versendet: { text: "Der Versand läuft. Bei vielen Empfängerinnen dauert er ein paar Minuten." },
+  bestaetigen: { text: "Bitte bestätige zuerst, dass die Nachricht verschickt werden soll.", error: true },
+  nichteingerichtet: { text: "Der Versand ist noch nicht eingerichtet (Schlüssel für E-Mail bzw. SMS fehlt bei Vercel).", error: true },
+  schonversendet: { text: "Diese Nachricht wurde schon verschickt.", error: true },
   fehler: { text: "Das hat nicht geklappt. Bitte noch einmal versuchen.", error: true },
 };

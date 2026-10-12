@@ -9,6 +9,9 @@ import { saveCustomer } from "../../actions";
 
 export const metadata: Metadata = { title: "Kundin" };
 
+const months = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
+const euro = (n: number) => new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(n);
+
 type Props = { params: Promise<{ id: string }>; searchParams: Promise<{ meldung?: string }> };
 
 export default function CustomerPage(props: Props) {
@@ -26,7 +29,7 @@ async function Details({ params, searchParams }: Props) {
   if (!/^[0-9a-f-]{36}$/.test(id)) notFound();
 
   const [{ data: c }, { data: appts }] = await Promise.all([
-    supabase.from("customers").select("id, first_name, last_name, email, phone, notes, marketing_consent, created_at").eq("id", id).maybeSingle(),
+    supabase.from("customers").select("id, first_name, last_name, email, phone, notes, marketing_consent, birthday_day, birthday_month, created_at").eq("id", id).maybeSingle(),
     supabase
       .from("appointments")
       .select("id, start_time, status, price, services(name)")
@@ -38,6 +41,7 @@ async function Details({ params, searchParams }: Props) {
   const list = (appts ?? []) as unknown as { id: string; start_time: string; status: string; price: number; services: { name: string } | null }[];
   const visits = list.filter((x) => x.status === "completed").length;
   const noShows = list.filter((x) => x.status === "no_show").length;
+  const revenue = list.filter((x) => x.status === "completed").reduce((sum, x) => sum + Number(x.price), 0);
 
   return (
     <div className="max-w-2xl">
@@ -46,9 +50,9 @@ async function Details({ params, searchParams }: Props) {
         {c.first_name} {c.last_name}
       </AdminTitle>
       <p className="-mt-4 mb-8 text-sm text-muted">
-        Kundin seit {fmtDate(c.created_at, { month: "long", year: "numeric" })}, {visits} Besuche
+        Kundin seit {fmtDate(c.created_at, { month: "long", year: "numeric" })}, {visits} Besuche, {euro(revenue)} Umsatz
         {noShows ? `, ${noShows}× nicht erschienen` : ""}
-        {c.marketing_consent ? ", möchte Newsletter" : ""}
+        {c.birthday_day ? `, Geburtstag ${c.birthday_day}. ${months[c.birthday_month - 1]}` : ""}
       </p>
 
       <form action={saveCustomer} className="space-y-4 border border-line bg-white p-5">
@@ -64,6 +68,23 @@ async function Details({ params, searchParams }: Props) {
           <textarea name="notes" rows={4} defaultValue={c.notes ?? ""} className={`${inputClass} py-2`} />
         </label>
         <p className="text-sm text-muted">Gesundheitsangaben nur, wenn nötig und mit Einverständnis der Kundin.</p>
+        <fieldset>
+          <legend className="label text-muted">Geburtstag (ohne Jahr)</legend>
+          <div className="mt-1.5 flex gap-2">
+            <select name="birthday_day" defaultValue={c.birthday_day ?? ""} aria-label="Tag" className={`${inputClass} mt-0 w-24`}>
+              <option value="">Tag</option>
+              {Array.from({ length: 31 }, (_, i) => <option key={i + 1} value={i + 1}>{i + 1}.</option>)}
+            </select>
+            <select name="birthday_month" defaultValue={c.birthday_month ?? ""} aria-label="Monat" className={`${inputClass} mt-0 flex-1`}>
+              <option value="">Monat</option>
+              {months.map((m, i) => <option key={m} value={i + 1}>{m}</option>)}
+            </select>
+          </div>
+        </fieldset>
+        <label className="flex items-start gap-3 text-sm text-muted">
+          <input type="checkbox" name="marketing_consent" defaultChecked={c.marketing_consent} className="mt-0.5 h-5 w-5 shrink-0 accent-espresso" />
+          <span>Möchte Angebote und Geburtstagsgrüße per E-Mail/SMS. Nur anhaken, wenn die Kundin ausdrücklich zugestimmt hat.</span>
+        </label>
         <button type="submit" className={btnSolid}>Speichern</button>
       </form>
 

@@ -1,6 +1,6 @@
 # Roadmap und Verkaufsargumente
 
-Stand: 11.10.2026. Ziel: Planity und Treatwell für kleine Studios überflüssig machen, Stück für Stück.
+Stand: 12.10.2026. Ziel: Planity und Treatwell für kleine Studios überflüssig machen, Stück für Stück.
 
 ## Das Kernproblem: Bewertungen auf Planity
 
@@ -25,7 +25,9 @@ Studios bleiben oft nur wegen ihrer Bewertungen bei Planity. Unsere Antwort:
 | 2 | Bewertungsanfrage nach dem Termin | eigene Google-Bewertungen | 6 |
 | 3 | Nachbuchungs-Erinnerung je Behandlung („Zeit für dein nächstes Facial") | Stammkundinnen kommen regelmäßiger | 6 |
 | 4 | Anzahlung nur für Neukundinnen oder teure Behandlungen (Stripe) | Schutz vor Ausfällen | 7 |
-| 5 | Warteliste für volle Tage, automatische Nachricht bei Absage | volle Auslastung | später |
+| 5 | Warteliste für volle Tage, automatische SMS bei Absage | volle Auslastung | fertig |
+| 5b | Geburtstagsgruß mit Gutschein, Rundnachrichten per E-Mail/SMS | Stammkundinnen, Umsatz in ruhigen Wochen | fertig |
+| 5c | Statistik: Umsatz, Ausfälle, Neukundinnen, Top-Behandlungen, Umsatz pro Kundin | Überblick ohne Excel | fertig |
 | 6 | Gutscheine online verkaufen | Umsatz ohne Termin, Weihnachten | später |
 | 7 | Pakete (z. B. 6 Laser-Sitzungen) mit Zähler | Vorauszahlung, Bindung | später |
 | 8 | Hautprofil je Kundin (Hauttyp, Ampullen, Verlauf) | Fachwissen im eigenen System | später |

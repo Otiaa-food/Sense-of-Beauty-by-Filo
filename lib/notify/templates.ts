@@ -149,3 +149,81 @@ export function ownerCancellationEmail(a: AppointmentInfo & { customerName: stri
     ),
   };
 }
+
+// ---------- Warteliste ----------
+
+export type WaitlistOffer = { firstName: string; serviceName: string; start: Date; bookUrl: string };
+
+/** Filos Wunschtext: „Hey Beauty, dein Termin ist verfügbar" */
+export function waitlistOfferSms(o: WaitlistOffer): string {
+  return `Hey Beauty, dein Termin ist verfügbar! ${o.serviceName.slice(0, 35)}, ${fmtShort(o.start)} ${fmtTime(o.start)} Uhr. Schnell buchen: ${o.bookUrl}`;
+}
+
+export function waitlistOfferEmail(o: WaitlistOffer): Message {
+  const when = `${fmtDay(o.start)} um ${fmtTime(o.start)} Uhr`;
+  return {
+    subject: `Hey Beauty, dein Termin ist verfügbar: ${fmtShort(o.start)} ${fmtTime(o.start)} Uhr`,
+    text: `${hello(o.firstName)}\n\ngute Nachricht: An deinem Wunschtag ist etwas frei geworden.\n\n${o.serviceName}\n${when}\n\nWer zuerst bucht, bekommt den Termin: ${o.bookUrl}\n\nLiebe Grüße,\nFilo`,
+    html: layout(
+      `<p>${escape(hello(o.firstName))}</p><p>gute Nachricht: An deinem Wunschtag ist etwas frei geworden.</p><p><strong style="font-weight:500">${escape(o.serviceName)}</strong><br>${escape(when)}</p>${button(o.bookUrl, "Jetzt buchen")}<p style="color:#5F544C;font-size:14px">Wer zuerst bucht, bekommt den Termin. Du stehst auf der Warteliste, weil du dich auf der Website eingetragen hast.</p><p>Liebe Grüße,<br>Filo</p>`,
+    ),
+  };
+}
+
+// ---------- Geburtstag ----------
+
+export type BirthdayGreeting = {
+  firstName: string;
+  gift: string;
+  code: string;
+  validUntil: Date;
+  bookUrl: string;
+  unsubscribeUrl: string;
+};
+
+const fmtDate = (d: Date) => new Intl.DateTimeFormat("de-DE", { day: "numeric", month: "long", year: "numeric", timeZone: tz }).format(d);
+
+export function birthdayEmail(b: BirthdayGreeting): Message {
+  const codeText = b.code ? ` Code: ${b.code}.` : "";
+  const giftText = `Mein Geschenk für dich: ${b.gift}, gültig bis ${fmtDate(b.validUntil)}.${codeText}`;
+  return {
+    subject: `Alles Liebe zum Geburtstag, ${b.firstName || "Beauty"}!`,
+    text: `${hello(b.firstName)}\n\nalles Liebe zu deinem Geburtstag! Ich wünsche dir einen wunderschönen Tag.\n\n${giftText} Zeig einfach diese Nachricht im Studio.\n\nTermin buchen: ${b.bookUrl}\n\nHerzliche Grüße,\nFilo\n\nKeine Angebote und Geburtstagsgrüße mehr: ${b.unsubscribeUrl}`,
+    html: layout(
+      `<p>${escape(hello(b.firstName))}</p><p>alles Liebe zu deinem Geburtstag! Ich wünsche dir einen wunderschönen Tag.</p><p style="border-top:1px solid #DDD2C4;border-bottom:1px solid #DDD2C4;padding:16px 0;font-size:17px;font-weight:300">${escape(b.gift)}${b.code ? `<br><span style="font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#5F544C">Code: ${escape(b.code)}</span>` : ""}</p><p style="color:#5F544C;font-size:14px">Gültig bis ${escape(fmtDate(b.validUntil))}. Zeig einfach diese E-Mail im Studio.</p>${button(b.bookUrl, "Termin buchen")}<p>Herzliche Grüße,<br>Filo</p>`,
+      `<br><a href="${escape(b.unsubscribeUrl)}" style="color:#5F544C">Keine Angebote und Geburtstagsgrüße mehr erhalten</a>`,
+    ),
+  };
+}
+
+export function birthdaySms(b: BirthdayGreeting): string {
+  const code = b.code ? ` Code ${b.code}` : "";
+  return `Alles Liebe zum Geburtstag, ${b.firstName.slice(0, 20) || "Beauty"}! Dein Geschenk: ${b.gift.slice(0, 60)}${code}. Gültig bis ${fmtShort(b.validUntil)} Liebe Grüße, Filo. Abmelden: ${b.unsubscribeUrl}`;
+}
+
+// ---------- Rundnachricht ----------
+
+/** {vorname} im Text wird durch den Vornamen ersetzt */
+export function personalize(text: string, firstName: string): string {
+  return text.replace(/\{vorname\}/gi, firstName || "Beauty");
+}
+
+export function campaignEmail(c: { subject: string; body: string; firstName: string; bookUrl: string; unsubscribeUrl: string }): Message {
+  const body = personalize(c.body, c.firstName).trim();
+  const paragraphs = body
+    .split(/\n{2,}/)
+    .map((p) => `<p>${escape(p).replace(/\n/g, "<br>")}</p>`)
+    .join("");
+  return {
+    subject: personalize(c.subject, c.firstName),
+    text: `${body}\n\nTermin buchen: ${c.bookUrl}\n\nKeine Angebote mehr: ${c.unsubscribeUrl}`,
+    html: layout(
+      `${paragraphs}${button(c.bookUrl, "Termin buchen")}`,
+      `<br><a href="${escape(c.unsubscribeUrl)}" style="color:#5F544C">Keine Angebote mehr erhalten</a>`,
+    ),
+  };
+}
+
+export function campaignSms(c: { body: string; firstName: string; unsubscribeUrl: string }): string {
+  return `${personalize(c.body, c.firstName).trim()} Abmelden: ${c.unsubscribeUrl}`;
+}

@@ -76,6 +76,7 @@ beforeAll(async () => {
   await db.exec(read("supabase/migrations/20261009000003_admin.sql"));
   await db.exec(read("supabase/migrations/20261011000004_notifications.sql"));
   await db.exec(read("supabase/migrations/20261011000005_reviews.sql"));
+  await db.exec(read("supabase/migrations/20261012000006_waitlist_campaigns.sql"));
   await db.exec(read("supabase/seed.sql"));
 
   await db.exec(`insert into auth.users (id) values ('${ADMIN_ID}'), ('${OTHER_ID}');`);
@@ -508,5 +509,76 @@ describe("Bewertungen (Phase 8)", () => {
     expect(visible.map((r) => r.author_name)).not.toContain("Versteckt");
     const summary = await as("anon", null, async () => (await db.query("select key from public.settings where key = 'review_summary'")).rows);
     expect(summary).toHaveLength(1);
+  });
+});
+
+describe("Warteliste und Kampagnen", () => {
+  it("braucht Kontakt und gültiges Zeitfenster", async () => {
+    const svc = await one<{ id: string }>("select id from public.services limit 1");
+    await expect(
+      db.query("insert into public.waitlist (service_id, desired_date, first_name, last_name) values ($1, '2027-01-08', 'B', 'X')", [svc.id]),
+    ).rejects.toThrow(/waitlist_contact/);
+    await expect(
+      db.query(
+        "insert into public.waitlist (service_id, desired_date, time_from, time_to, first_name, last_name, phone) values ($1, '2027-01-08', '13:00', '16:00', 'B', 'X', '0176')",
+        [svc.id],
+      ),
+    ).resolves.toBeDefined();
+  });
+
+  it("Warteliste ist für Fremde unsichtbar", async () => {
+    const rows = await as("anon", null, async () => {
+      try {
+        return (await db.query("select * from public.waitlist")).rows;
+      } catch {
+        return [];
+      }
+    });
+    expect(rows).toHaveLength(0);
+    const asAdmin = await as("authenticated", ADMIN_ID, async () => (await db.query("select * from public.waitlist")).rows);
+    expect(asAdmin.length).toBeGreaterThan(0);
+  });
+
+  it("Geburtstag nur vollständig (Tag und Monat) und ohne Jahr", async () => {
+    await expect(db.query("update public.customers set birthday_day = 12 where last_name = 'Mail'")).rejects.toThrow(
+      /customers_birthday_complete/,
+    );
+    await expect(db.query("update public.customers set birthday_day = 12, birthday_month = 3 where last_name = 'Mail'")).resolves.toBeDefined();
+  });
+
+  it("jede Kundin hat einen eigenen Abmelde-Schlüssel", async () => {
+    const r = await db.query<{ n: number; distinct_n: number; bad: number }>(
+      "select count(*)::int as n, count(distinct unsubscribe_token)::int as distinct_n, count(*) filter (where unsubscribe_token !~ '^[a-f0-9]{64}$')::int as bad from public.customers",
+    );
+    expect(r.rows[0].n).toBeGreaterThan(0);
+    expect(r.rows[0].distinct_n).toBe(r.rows[0].n);
+    expect(r.rows[0].bad).toBe(0);
+  });
+
+  it("Rundnachricht per E-Mail braucht einen Betreff, nur Admin sieht sie", async () => {
+    await expect(db.query("insert into public.campaigns (channel, body) values ('email', 'Hallo')")).rejects.toThrow(/campaigns_email_subject/);
+    await db.query("insert into public.campaigns (channel, body) values ('sms', 'Hallo')");
+    const anon = await as("anon", null, async () => {
+      try {
+        return (await db.query("select * from public.campaigns")).rows;
+      } catch {
+        return [];
+      }
+    });
+    expect(anon).toHaveLength(0);
+    const other = await as("authenticated", OTHER_ID, async () => (await db.query("select * from public.campaigns")).rows);
+    expect(other).toHaveLength(0);
+  });
+
+  it("Status „gebucht“ für erledigte Wartelisten-Einträge", async () => {
+    await expect(db.query("update public.waitlist set status = 'booked'")).resolves.toBeDefined();
+    await expect(db.query("update public.waitlist set status = 'quatsch'")).rejects.toThrow();
+  });
+
+  it("verhindert doppelten Versand über den Schlüssel", async () => {
+    const ins = () =>
+      db.query("insert into public.message_log (dedupe_key, type, channel) values ('birthday:x:2027:email', 'birthday', 'email') on conflict do nothing returning id");
+    expect((await ins()).rows).toHaveLength(1);
+    expect((await ins()).rows).toHaveLength(0);
   });
 });

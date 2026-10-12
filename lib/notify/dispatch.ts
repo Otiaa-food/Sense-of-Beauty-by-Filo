@@ -3,7 +3,9 @@ import { dateToLocal, dayRange } from "@/lib/admin/time";
 import { brand } from "@/lib/brand.config";
 import { buildIcs } from "@/lib/notify/ics";
 import { emailConfigured, sendEmail, sendSms, smsConfigured, type SendResult } from "@/lib/notify/send";
+import { siteUrl } from "@/lib/notify/site";
 import * as t from "@/lib/notify/templates";
+import { expireWaitlist, sendBirthdayGreetings } from "@/lib/notify/outreach";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 /**
@@ -24,11 +26,7 @@ type Kind =
   | "owner_cancellation";
 type Channel = "email" | "sms";
 
-export function siteUrl(): string {
-  if (process.env.SITE_URL) return process.env.SITE_URL.replace(/\/$/, "");
-  if (process.env.VERCEL_PROJECT_PRODUCTION_URL) return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
-  return brand.siteUrl;
-}
+export { siteUrl };
 
 type Loaded = {
   id: string;
@@ -229,7 +227,7 @@ function localDay(now: Date, offset: number) {
 
 export async function runDailyJobs(now = new Date()) {
   const admin = createAdminClient();
-  const summary = { reminders: 0, sms: 0, reviews: 0, rebooks: 0 };
+  const summary = { reminders: 0, sms: 0, reviews: 0, rebooks: 0, birthdays: 0, waitlistExpired: 0 };
 
   // 1. Erinnerung für morgen (E-Mail und SMS)
   const tomorrow = localDay(now, 1);
@@ -304,6 +302,16 @@ export async function runDailyJobs(now = new Date()) {
     const msg = t.rebookEmail(a.customer.firstName, a.serviceName, `${siteUrl()}/book`, `${siteUrl()}/abmelden/${a.token}`);
     if (await deliver(a.id, "rebook", "email", a.start, () => sendEmail({ to: a.customer.email!, ...msg }))) summary.rebooks++;
   }
+
+  // 4. Geburtstagsgrüße (nur wenn im Admin eingeschaltet, nur mit Werbe-Einwilligung)
+  try {
+    summary.birthdays = await sendBirthdayGreetings(now);
+  } catch (e) {
+    console.error("Geburtstagsgrüße fehlgeschlagen:", e);
+  }
+
+  // 5. Warteliste: vergangene Wunschtage beenden
+  summary.waitlistExpired = await expireWaitlist(dateToLocal(now, brand.timezone).date);
 
   return summary;
 }

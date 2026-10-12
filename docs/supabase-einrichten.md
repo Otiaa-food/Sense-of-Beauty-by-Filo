@@ -18,12 +18,16 @@ zuerst alle Dateien aus `supabase/migrations` (nach Datum sortiert), danach `sup
 | --- | --- | --- |
 | 1 | `supabase/migrations/20261008000001_schema.sql` | Legt alle Tabellen an und die Sperre gegen Doppelbuchung |
 | 2 | `supabase/migrations/20261008000002_security.sql` | Zugriffsregeln: wer darf was sehen, plus Buchungsfunktion |
-| 3 | `supabase/seed.sql` | Filos Behandlungen, Arbeitszeiten und Studio-Einstellungen |
+| 3 | `supabase/migrations/20261009000003_admin.sql` | Admin-Zugang |
+| 4 | `supabase/migrations/20261011000004_notifications.sql` | Erinnerungen und Nachrichten |
+| 5 | `supabase/migrations/20261011000005_reviews.sql` | Bewertungen |
+| 6 | `supabase/migrations/20261012000006_waitlist_campaigns.sql` | Warteliste, Geburtstag, Rundnachrichten |
+| 7 | `supabase/seed.sql` | Filos Behandlungen, Arbeitszeiten und Studio-Einstellungen |
 
 Pro Datei: Inhalt einfügen, **Run** klicken. Unten erscheint „Success. No rows returned". Das ist richtig.
 
 Wenn eine rote Fehlermeldung kommt: nicht weitermachen, Text kopieren und mir schicken.
-Jede Datei nur **einmal** ausführen (Datei 1 und 2 brechen beim zweiten Mal ab, das ist gewollt).
+Jede Datei nur **einmal** ausführen (die Migrationen brechen beim zweiten Mal ab, das ist gewollt).
 
 ## Schritt 2: Öffentliche Registrierung ausschalten (wichtig)
 

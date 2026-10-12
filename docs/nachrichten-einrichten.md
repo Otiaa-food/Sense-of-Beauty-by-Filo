@@ -11,6 +11,9 @@ Was automatisch verschickt wird:
 | Täglich ca. 17–18 Uhr | Erinnerung für morgen per E-Mail **und SMS** | Kundin |
 | Täglich | Bewertungsanfrage (Google) nach „Erschienen", je Kundin nur einmal | Kundin |
 | Täglich | „Zeit für deine nächste Behandlung?" nach X Tagen (je Behandlung im Admin), nur mit Werbe-Einwilligung | Kundin |
+| Sofort bei Absage (online oder im Admin) und beim Verschieben | „Hey Beauty, dein Termin ist verfügbar" per SMS (+ E-Mail) mit Link zum Tag | Kundinnen auf der Warteliste für diesen Tag |
+| Täglich, wenn im Admin unter „Kampagnen" eingeschaltet | Geburtstagsgruß mit Geschenk/Code, nur mit Werbe-Einwilligung | Geburtstagskind |
+| Wenn Filo es auslöst (Kampagnen → Rundnachricht) | E-Mail oder SMS an alle mit Werbe-Einwilligung, mit Abmelde-Link | Kundinnen |
 
 Ohne eingerichtete Schlüssel wird einfach nichts verschickt, die Buchung funktioniert trotzdem.
 
@@ -48,7 +51,8 @@ Danach **Redeploy**. Der tägliche Lauf ist in `vercel.json` eingetragen (15:00 
 
 ## 5. Datenbank
 
-Im SQL Editor `supabase/migrations/20261011000004_notifications.sql` ausführen.
+Im SQL Editor `supabase/migrations/20261011000004_notifications.sql` ausführen,
+für Warteliste und Kampagnen zusätzlich `supabase/migrations/20261012000006_waitlist_campaigns.sql`.
 
 ## Neues Studio (Weiterverkauf)
 

@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import { PageIntro } from "@/components/public/PageIntro";
 import { unsubscribe } from "./actions";
 
-export const metadata: Metadata = { title: "E-Mails abbestellen", robots: { index: false, follow: false } };
+export const metadata: Metadata = { title: "Nachrichten abbestellen", robots: { index: false, follow: false } };
 
 type Props = { params: Promise<{ token: string }>; searchParams: Promise<{ erledigt?: string }> };
 
@@ -23,14 +23,14 @@ async function Content({ params, searchParams }: Props) {
   if (erledigt) {
     return (
       <PageIntro title="Abbestellt">
-        <p>Du bekommst keine Erinnerungen an neue Behandlungen und keine Angebote mehr. Nachrichten zu gebuchten Terminen erhältst du weiterhin.</p>
+        <p>Du bekommst keine Angebote, Geburtstagsgrüße und Erinnerungen an neue Behandlungen mehr. Nachrichten zu gebuchten Terminen erhältst du weiterhin.</p>
       </PageIntro>
     );
   }
   return (
     <>
-      <PageIntro title="E-Mails abbestellen">
-        <p>Möchtest du keine Erinnerungen an neue Behandlungen und keine Angebote mehr bekommen?</p>
+      <PageIntro title="Nachrichten abbestellen">
+        <p>Möchtest du keine Angebote, Geburtstagsgrüße und Erinnerungen an neue Behandlungen mehr bekommen, weder per E-Mail noch per SMS?</p>
       </PageIntro>
       {/* Bewusst mit Knopf: Mailprogramme öffnen Links manchmal automatisch */}
       <form action={unsubscribe} className="mt-8">

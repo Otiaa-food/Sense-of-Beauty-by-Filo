@@ -58,3 +58,6 @@ eigenes Supabase-Projekt und eigene Schlüssel in `.env.local`.
 8. Bewertungen (fertig, Migration 20261011000005_reviews.sql)
 9. Planity-Import
 10. Feinschliff
+
+Zusätzlich (Filos Wünsche, Migration 20261012000006_waitlist_campaigns.sql): Bestätigungs-Fenster mit
+Buchungsbedingungen, Warteliste mit SMS bei Absage, Geburtstagsgruß, Rundnachrichten, Statistik.

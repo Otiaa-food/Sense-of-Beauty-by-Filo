@@ -30,7 +30,7 @@ export default async function BookPage() {
       <div className="mt-6">
         {catalog.ok && groups.length > 0 ? (
           <Suspense fallback={<p className="mt-10 text-muted">Wird geladen …</p>}>
-            <BookingFlow groups={groups} phone={brand.contact.phone} />
+            <BookingFlow groups={groups} phone={brand.contact.phone} cancelHours={brand.booking.freeCancellationHours} />
           </Suspense>
         ) : (
           <div className="mt-10">

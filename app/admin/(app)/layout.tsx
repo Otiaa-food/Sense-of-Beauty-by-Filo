@@ -4,7 +4,10 @@ import { logout } from "@/app/admin/login/actions";
 const links = [
   { href: "/admin", label: "Kalender" },
   { href: "/admin/appointments", label: "Termine" },
+  { href: "/admin/warteliste", label: "Warteliste" },
   { href: "/admin/customers", label: "Kundinnen" },
+  { href: "/admin/statistik", label: "Statistik" },
+  { href: "/admin/kampagnen", label: "Kampagnen" },
   { href: "/admin/services", label: "Behandlungen" },
   { href: "/admin/availability", label: "Zeiten & Urlaub" },
   { href: "/admin/reviews", label: "Bewertungen" },
