@@ -475,3 +475,13 @@ export async function deleteCampaign(formData: FormData) {
   const { error } = await supabase.from("campaigns").delete().eq("id", id).is("sent_at", null);
   back("/admin/kampagnen", error ? "fehler" : "geloescht");
 }
+
+// ---------- Übersicht ----------
+
+/** Leitsatz auf der Übersicht ändern (leer = Standardtext) */
+export async function saveMotto(formData: FormData) {
+  const { supabase } = await requireAdmin();
+  const text = String(formData.get("motto") ?? "").trim().slice(0, 240);
+  const { error } = await supabase.from("settings").upsert({ key: "admin_motto", value: text, is_public: false }, { onConflict: "key" });
+  back("/admin", error ? "fehler" : "gespeichert");
+}

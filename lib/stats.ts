@@ -15,7 +15,10 @@ export type StatAppointment = {
   customer_id: string;
   customer_name: string;
   service_name: string;
+  category_name?: string;
 };
+
+export type Slice = { label: string; value: number };
 
 export type Range = { from: string; to: string };
 
@@ -120,7 +123,20 @@ export type Stats = {
   customers: { id: string; name: string; visits: number; revenue: number }[];
   weekdays: { label: string; count: number }[];
   hours: { label: string; count: number }[];
+  /** Für die Kreisdiagramme */
+  byCategory: Slice[];
+  customerMix: Slice[];
+  channel: Slice[];
+  outcomes: Slice[];
 };
+
+/** Größte Stücke behalten, den Rest als „Weitere" zusammenfassen (Kreise bleiben lesbar) */
+export function topSlices(items: Slice[], keep = 4): Slice[] {
+  const sorted = [...items].filter((i) => i.value > 0).sort((a, b) => b.value - a.value);
+  if (sorted.length <= keep + 1) return sorted;
+  const rest = sorted.slice(keep).reduce((s, i) => s + i.value, 0);
+  return [...sorted.slice(0, keep), { label: "Weitere", value: rest }];
+}
 
 const weekdayLabels = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
 
@@ -181,6 +197,12 @@ export function computeStats(rows: StatAppointment[], range: Range, knownBefore:
           return { label: `${h} Uhr`, count: hourMap.get(h) ?? 0 };
         });
 
+  const categories = new Map<string, number>();
+  for (const r of completed) {
+    const k = r.category_name ?? "Ohne Kategorie";
+    categories.set(k, (categories.get(k) ?? 0) + Number(r.price));
+  }
+
   const attended = completed.length + noShows;
   return {
     revenue,
@@ -199,6 +221,20 @@ export function computeStats(rows: StatAppointment[], range: Range, knownBefore:
     customers: [...customers.values()].sort((a, b) => b.revenue - a.revenue || b.visits - a.visits),
     weekdays: weekdays.slice(0, 6).concat(weekdays[6].count ? [weekdays[6]] : []),
     hours,
+    byCategory: topSlices([...categories.entries()].map(([label, value]) => ({ label, value }))),
+    customerMix: [
+      { label: "Neukundinnen", value: newCustomers },
+      { label: "Stammkundinnen", value: visitors.size - newCustomers },
+    ],
+    channel: [
+      { label: "Online gebucht", value: booked.filter((r) => r.source === "online").length },
+      { label: "Im Studio eingetragen", value: booked.filter((r) => r.source !== "online").length },
+    ],
+    outcomes: [
+      { label: "Erschienen", value: completed.length },
+      { label: "Abgesagt", value: cancelled },
+      { label: "Nicht erschienen", value: noShows },
+    ],
   };
 }
 

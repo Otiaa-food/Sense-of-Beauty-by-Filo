@@ -52,12 +52,12 @@ async function Details({ params, searchParams }: Props) {
   return (
     <div className="max-w-2xl">
       <Flash code={meldung} />
-      <Link href={`/admin?tag=${local.date}`} className="label text-muted underline underline-offset-4">Zum Kalender</Link>
+      <Link href={`/admin/kalender?ansicht=tag&tag=${local.date}`} className="label text-muted underline underline-offset-4">Zum Kalender</Link>
       <div className="mt-4">
         <AdminTitle action={<StatusBadge status={a.status} />}>{service?.name ?? "Termin"}</AdminTitle>
       </div>
 
-      <dl className="divide-y divide-line border-y border-line bg-white">
+      <dl className="card divide-y divide-card-line overflow-hidden">
         {[
           ["Wann", `${fmtDate(a.start_time, { weekday: "long", day: "numeric", month: "long", year: "numeric" })}, ${fmtTime(a.start_time)}–${fmtTime(a.end_time)} Uhr`],
           ["Pause bis", `${fmtTime(a.blocked_until)} Uhr`],

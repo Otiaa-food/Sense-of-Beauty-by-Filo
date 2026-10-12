@@ -69,7 +69,7 @@ async function Content({ searchParams }: Props) {
         </p>
       ) : null}
 
-      {byDay.size === 0 ? <p className="mt-8 border border-line bg-white p-5 text-muted">Gerade steht niemand auf der Warteliste.</p> : null}
+      {byDay.size === 0 ? <p className="mt-8 card p-5 text-muted">Gerade steht niemand auf der Warteliste.</p> : null}
 
       <div className="mt-8 space-y-10">
         {[...byDay.entries()].map(([day, list]) => (
@@ -81,7 +81,7 @@ async function Content({ searchParams }: Props) {
                 <button type="submit" className={btnOutline}>Freie Zeit jetzt prüfen</button>
               </form>
             </div>
-            <ul className="mt-3 divide-y divide-line border-y border-line bg-white">
+            <ul className="mt-3 card divide-y divide-card-line overflow-hidden">
               {list.map((r) => (
                 <li key={r.id} className="flex flex-wrap items-start justify-between gap-3 px-4 py-4">
                   <div className="min-w-0">

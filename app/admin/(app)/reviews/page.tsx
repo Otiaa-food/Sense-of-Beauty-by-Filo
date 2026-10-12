@@ -55,7 +55,7 @@ async function Content({ searchParams }: Props) {
         <p className="mt-2 text-muted">
           Sterneschnitt und Anzahl von Google und Planity. Bitte gelegentlich aktualisieren, die Zahlen müssen stimmen. Leer lassen = wird nicht angezeigt.
         </p>
-        <form action={saveReviewSummary} className="mt-5 space-y-5 border border-line bg-white p-5">
+        <form action={saveReviewSummary} className="mt-5 space-y-5 card p-5">
           <div className="grid gap-4 sm:grid-cols-2">
             <fieldset className="space-y-3">
               <legend className="label text-espresso">Google</legend>
@@ -80,7 +80,7 @@ async function Content({ searchParams }: Props) {
           nur Vorname und Anfangsbuchstabe verwenden (z. B. „Maria K.“).
         </p>
 
-        <ul className="mt-6 divide-y divide-line border-y border-line bg-white">
+        <ul className="mt-6 card divide-y divide-card-line overflow-hidden">
           {list.length === 0 ? <li className="px-4 py-4 text-muted">Noch keine Stimmen eingetragen.</li> : null}
           {list.map((r) => (
             <li key={r.id} className="px-4 py-4">
@@ -115,7 +115,7 @@ async function Content({ searchParams }: Props) {
           ))}
         </ul>
 
-        <form action={addReview} className="mt-6 space-y-4 border border-line bg-white p-5">
+        <form action={addReview} className="mt-6 space-y-4 card p-5">
           <p className="label text-espresso">Neue Stimme</p>
           <div className="grid gap-4 sm:grid-cols-3">
             <label className="block sm:col-span-2"><span className="label !text-[0.6rem] text-muted">Name (z. B. Maria K.)</span><input name="author_name" required maxLength={80} className={inputClass} /></label>

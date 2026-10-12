@@ -41,10 +41,10 @@ async function List({ searchParams }: Props) {
         <button type="submit" className={btnOutline}>Suchen</button>
       </form>
       {(data ?? []).length === 0 ? <p className="text-muted">Keine Kundinnen gefunden.</p> : null}
-      <ul className="divide-y divide-line border-y border-line bg-white">
+      <ul className="card divide-y divide-card-line overflow-hidden">
         {(data ?? []).map((c) => (
           <li key={c.id}>
-            <Link href={`/admin/customers/${c.id}`} className="block px-4 py-3 hover:bg-paper">
+            <Link href={`/admin/customers/${c.id}`} className="block px-4 py-3 hover:bg-sand/60">
               <span className="block text-espresso">{c.last_name}, {c.first_name}</span>
               <span className="block text-sm text-muted">{[c.phone, c.email].filter(Boolean).join(", ")}</span>
             </Link>

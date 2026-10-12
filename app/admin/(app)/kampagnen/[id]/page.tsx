@@ -62,13 +62,13 @@ async function Content({ params, searchParams }: Props) {
       <section>
         <h2 className="label text-muted">Vorschau (Beispiel: Maria)</h2>
         {email ? (
-          <div className="mt-3 border border-line bg-white">
-            <p className="border-b border-line px-4 py-3 text-sm text-espresso">Betreff: {email.subject}</p>
+          <div className="mt-3 card">
+            <p className="border-b border-card-line px-4 py-3 text-sm text-espresso">Betreff: {email.subject}</p>
             <iframe title="Vorschau der E-Mail" srcDoc={email.html} sandbox="" className="h-[32rem] w-full" />
           </div>
         ) : null}
         {sms ? (
-          <div className="mt-3 max-w-sm border border-line bg-white p-4 text-[0.95rem] leading-relaxed text-espresso">
+          <div className="mt-3 max-w-sm card p-4 text-[0.95rem] leading-relaxed text-espresso">
             {sms}
             <p className="mt-3 text-xs text-muted">{sms.length} Zeichen{sms.length > 160 ? `, wird als ${Math.ceil(sms.length / 153)} SMS berechnet` : ""}</p>
           </div>
@@ -76,7 +76,7 @@ async function Content({ params, searchParams }: Props) {
       </section>
 
       {c.sent_at ? (
-        <section className="mt-10 border border-line bg-white p-5">
+        <section className="mt-10 card p-5">
           <p className="text-espresso">
             Verschickt am {fmtDate(c.sent_at)}, {fmtTime(c.sent_at)} Uhr: {sent} von {c.recipients || reachable || 0} angekommen
             {failed ? `, ${failed} fehlgeschlagen` : ""}.
@@ -84,7 +84,7 @@ async function Content({ params, searchParams }: Props) {
           <p className="mt-2 text-sm text-muted">Läuft der Versand noch, Seite in einer Minute neu laden.</p>
         </section>
       ) : (
-        <section className="mt-10 space-y-5 border border-line bg-white p-5">
+        <section className="mt-10 space-y-5 card p-5">
           <p className="text-espresso">
             Geht an <strong className="font-medium">{reachable ?? 0} Kundinnen</strong> mit Einwilligung
             {channel === "sms" ? " (SMS kosten je Stück, siehe seven.io)." : "."}

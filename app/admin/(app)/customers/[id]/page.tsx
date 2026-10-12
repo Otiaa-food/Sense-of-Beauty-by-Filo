@@ -55,7 +55,7 @@ async function Details({ params, searchParams }: Props) {
         {c.birthday_day ? `, Geburtstag ${c.birthday_day}. ${months[c.birthday_month - 1]}` : ""}
       </p>
 
-      <form action={saveCustomer} className="space-y-4 border border-line bg-white p-5">
+      <form action={saveCustomer} className="space-y-4 card p-5">
         <input type="hidden" name="id" value={c.id} />
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="block"><span className="label text-muted">Vorname</span><input name="first_name" required defaultValue={c.first_name} className={inputClass} /></label>
@@ -90,10 +90,10 @@ async function Details({ params, searchParams }: Props) {
 
       <h2 className="mt-10 text-xl font-light text-espresso">Termine</h2>
       {list.length === 0 ? <p className="mt-4 text-muted">Noch keine Termine.</p> : null}
-      <ul className="mt-4 divide-y divide-line border-y border-line bg-white">
+      <ul className="mt-4 card divide-y divide-card-line overflow-hidden">
         {list.map((x) => (
           <li key={x.id}>
-            <Link href={`/admin/appointments/${x.id}`} className="flex flex-wrap items-center gap-x-4 gap-y-1 px-4 py-3 hover:bg-paper">
+            <Link href={`/admin/appointments/${x.id}`} className="flex flex-wrap items-center gap-x-4 gap-y-1 px-4 py-3 hover:bg-sand/60">
               <span className="w-32 text-sm text-espresso">{fmtDate(x.start_time)}, {fmtTime(x.start_time)}</span>
               <span className="min-w-0 flex-1 text-sm text-muted">{x.services?.name}</span>
               <StatusBadge status={x.status} />

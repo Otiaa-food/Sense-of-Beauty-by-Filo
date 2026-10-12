@@ -37,3 +37,28 @@ Vorbild: lumoskinlab.de (Aufbau, Bildsprache, Ruhe), übertragen auf Filos warme
   So läuft dein Termin, Behandlungen mit Bild, Instagram-Raster, Footer mit Kontakt.
 - Über Filo (mit Stimmen), Behandlungen & Preise (dunkle Karten je Kategorie mit Foto), Studio (Mosaik),
   Termine (Buchen, Pflegehinweise, Stornierung), Kontakt.
+
+## Admin-Bereich (eigener, weicherer Look)
+
+Die Website bleibt eckig (Lumo-Stil). Das Admin ist eine App für Filo und darf weicher sein:
+
+- Flächen: Sand `#F4EDE3` (Hintergrund), Karten `#FFFDF9` mit runden Ecken (`.card`, 20 px) und weichem Schatten
+- Seitenleiste dunkel (Espresso `#2B2420`), aktiver Punkt Kakao `#7A5440`, Icons Karamell `#C79F7D`
+- Knöpfe als Pillen, Icons von lucide-react (dünne Linien, 1,6 px)
+- Bewegung: Zahlen zählen hoch, Balken wachsen, Kreise füllen sich, Linie wird von links aufgedeckt. Einmal beim Öffnen,
+  ca. 1 Sekunde, gestaffelt. Bei „Bewegung reduzieren“ im Betriebssystem ist alles sofort fertig.
+
+### Diagramm-Farben (Kreisdiagramme)
+
+Feste Reihenfolge, geprüft auf Farbsehschwäche (Rot-Grün), Unterscheidbarkeit und Kontrast:
+
+| Platz | Farbe | Hex |
+| --- | --- | --- |
+| 1 | Terrakotta | `#A4512C` |
+| 2 | Petrol | `#008B7D` |
+| 3 | Ocker | `#B07A00` |
+| 4 | Pflaume | `#8E3F82` |
+| 5 | Blau | `#2F6DB5` |
+| „Weitere“ | Grau-Beige | `#B9AEA3` |
+
+Mehr als 5 Stücke werden zu „Weitere“ zusammengefasst. Einzelne Reihen (Balken, Linie) sind immer Kakao `#7A5440`.

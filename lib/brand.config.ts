@@ -21,6 +21,10 @@ export const brand = {
   name: "Sense of Beauty",
   byline: "by Filo",
   fullName: "Sense of Beauty by Filo",
+  /** Vorname der Inhaberin (Begrüßung im Admin) */
+  ownerName: "Filo",
+  /** Standard-Leitsatz für die Übersicht, im Admin änderbar */
+  motto: "Schöne Haut beginnt damit, dass jemand genau hinschaut und weiß, was sie wirklich braucht.",
   tagline: "Your Korean Skincare Expert",
   domain: "senseofbeauty.de",
   siteUrl: "https://senseofbeauty.de",

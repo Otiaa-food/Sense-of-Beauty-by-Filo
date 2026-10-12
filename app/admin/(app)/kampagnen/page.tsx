@@ -46,7 +46,7 @@ async function Content({ searchParams }: Props) {
         das mit ihrer Zustimmung eingetragen hast). Jede Nachricht enthält einen Abmelde-Link.
       </p>
       {!mailOn || !smsOn ? (
-        <p className="mt-4 border border-line bg-white p-4 text-sm text-muted">
+        <p className="mt-4 card p-4 text-sm text-muted">
           {!mailOn ? "E-Mail-Versand ist noch nicht eingerichtet. " : ""}
           {!smsOn ? "SMS-Versand ist noch nicht eingerichtet. " : ""}
           Anleitung: docs/nachrichten-einrichten.md
@@ -58,7 +58,7 @@ async function Content({ searchParams }: Props) {
         <p className="mt-2 text-muted">
           Läuft automatisch jeden Tag um 17 Uhr. {withBirthday ?? 0} Kundinnen haben einen Geburtstag hinterlegt und Angebote erlaubt.
         </p>
-        <form action={saveBirthdayCampaign} className="mt-5 space-y-5 border border-line bg-white p-5">
+        <form action={saveBirthdayCampaign} className="mt-5 space-y-5 card p-5">
           <label className="flex items-center gap-3 text-espresso">
             <input type="checkbox" name="enabled" defaultChecked={b.enabled} className="h-5 w-5 accent-espresso" />
             Geburtstagsgrüße automatisch verschicken
@@ -102,7 +102,7 @@ async function Content({ searchParams }: Props) {
           Zum Beispiel für freie Termine, neue Behandlungen oder ein Angebot. Erreichbar: {emailCount ?? 0} per E-Mail, {smsCount ?? 0} per SMS.
           Du siehst vor dem Versand eine Vorschau.
         </p>
-        <form action={createCampaign} className="mt-5 space-y-4 border border-line bg-white p-5">
+        <form action={createCampaign} className="mt-5 space-y-4 card p-5">
           <label className="block">
             <span className="label text-muted">Kanal</span>
             <select name="channel" defaultValue="email" className={inputClass}>
@@ -123,10 +123,10 @@ async function Content({ searchParams }: Props) {
         </form>
 
         {campaigns && campaigns.length > 0 ? (
-          <ul className="mt-8 divide-y divide-line border-y border-line bg-white">
+          <ul className="mt-8 card divide-y divide-card-line overflow-hidden">
             {campaigns.map((c) => (
               <li key={c.id}>
-                <Link href={`/admin/kampagnen/${c.id}`} className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 hover:bg-paper">
+                <Link href={`/admin/kampagnen/${c.id}`} className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 hover:bg-sand/60">
                   <span className="min-w-0 flex-1 truncate text-espresso">{c.subject ?? c.body}</span>
                   <span className="text-sm text-muted">
                     {c.channel === "email" ? "E-Mail" : "SMS"},{" "}

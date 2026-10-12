@@ -15,7 +15,7 @@ export function NewAppointmentForm({ services, customer, day }: { services: Serv
   return (
     <form action={action} className="max-w-2xl space-y-8">
       {state.message ? (
-        <p role="alert" className="border border-espresso bg-white p-4 text-espresso">{state.message}</p>
+        <p role="alert" className="rounded-2xl border border-cocoa/40 bg-white p-4 text-espresso">{state.message}</p>
       ) : null}
 
       <fieldset className="space-y-5">
@@ -51,7 +51,7 @@ export function NewAppointmentForm({ services, customer, day }: { services: Serv
         {customer ? (
           <>
             <input type="hidden" name="customerId" value={customer.id} />
-            <p className="border border-line bg-white p-4 text-espresso">
+            <p className="card p-4 text-espresso">
               {customer.first_name} {customer.last_name}
               <span className="block text-sm text-muted">{[customer.phone, customer.email].filter(Boolean).join(", ")}</span>
             </p>

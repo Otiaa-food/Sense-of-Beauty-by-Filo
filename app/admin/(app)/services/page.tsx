@@ -54,7 +54,7 @@ async function List({ searchParams }: Props) {
         {categories.map((cat) => (
           <section key={cat}>
             <h2 className="label text-muted">{cat}</h2>
-            <ul className="mt-2 divide-y divide-line border-y border-line bg-white">
+            <ul className="mt-2 card divide-y divide-card-line overflow-hidden">
               {services
                 .filter((s) => (s.service_categories?.name ?? "Weitere") === cat)
                 .map((s) => (

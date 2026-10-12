@@ -11,13 +11,16 @@ type Props = { searchParams: Promise<{ fehler?: string }> };
 
 export default function LoginPage(props: Props) {
   return (
-    <div className="mx-auto flex min-h-dvh w-full max-w-sm flex-col justify-center px-5 py-16">
+    <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col justify-center px-5 py-16">
+      <div className="card p-8 md:p-10">
       <Logo />
-      <h1 className="mt-12 text-3xl font-light text-espresso">Admin-Bereich</h1>
+      <h1 className="mt-10 text-3xl font-light text-espresso">Willkommen zurück</h1>
+      <p className="mt-2 text-sm text-muted">Melde dich an, um deine Termine zu sehen.</p>
       <Suspense fallback={null}>
         <NoAccess {...props} />
       </Suspense>
       <LoginForm />
+      </div>
     </div>
   );
 }
@@ -30,7 +33,7 @@ async function NoAccess({ searchParams }: Props) {
     data: { user },
   } = await supabase.auth.getUser();
   return (
-    <div role="alert" className="mt-6 border border-line bg-white p-4 text-muted">
+    <div role="alert" className="mt-6 card p-4 text-muted">
       <p>
         {fehler === "pruefung"
           ? "Der Zugang konnte gerade nicht geprüft werden. Bitte später noch einmal versuchen."
